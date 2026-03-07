@@ -1,6 +1,4 @@
 import time
-import urllib.request
-import json
 import base64
 import io
 import streamlit as st
@@ -15,11 +13,11 @@ except ImportError:
 
 from config import (
     GROQ_API_KEY, MODEL_NAME, CHAPTERS, LANGUAGES,
-    get_starter_questions, CHAPTER_WIKI_MAP,
+    get_starter_questions,
 )
 from prompts import get_system_prompt
 
-VISION_MODEL = "llama-3.2-11b-vision-preview"
+VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 # --- Page Config ---
 st.set_page_config(
@@ -85,23 +83,6 @@ if "regen_lang" not in st.session_state:
 
 # --- Helper Functions ---
 
-@st.cache_data(ttl=3600)
-def get_chapter_diagram(chapter):
-    """Fetch a diagram image + caption from Wikipedia for the chapter."""
-    topic = CHAPTER_WIKI_MAP.get(chapter)
-    if not topic:
-        return None, None
-    try:
-        url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{topic}"
-        req = urllib.request.Request(url, headers={"User-Agent": "PadhAI-NCERT/1.0"})
-        with urllib.request.urlopen(req, timeout=5) as resp:
-            data = json.loads(resp.read().decode())
-            img_url = data.get("thumbnail", {}).get("source")
-            caption = data.get("description", topic.replace("_", " "))
-            return img_url, caption
-    except Exception:
-        return None, None
-
 
 def extract_pdf_text(pdf_bytes):
     """Extract text from PDF bytes (max 5 pages, 4000 chars)."""
@@ -123,9 +104,17 @@ def get_vision_response(image_bytes, mime_type, question, language, chapter):
     b64 = base64.b64encode(image_bytes).decode()
     if not question or not question.strip():
         question = (
-            "Is image mein kya dikh raha hai? NCERT Class 10 Science ke hisaab se explain karo."
+            "Yeh image dekh. Isme jo bhi text, headings, diagrams, equations, ya figures hain — "
+            "sab kuch padh aur samajh. Phir us poore topic ko ek friendly tutor ki tarah "
+            "step-by-step samjha: pehle concept kya hai, phir kaise kaam karta hai, "
+            "aur agar koi formula ya diagram ho toh usse bhi clearly explain kar. "
+            "NCERT Class 10 Science style mein rakh."
             if language == "Hinglish"
-            else "Idha paaru — NCERT Class 10 Science context-la enna irukku, explain pannu."
+            else "Idha image-a paaru. Ula irukkura text, headings, diagrams, equations, figures — "
+            "ellathayum padhi purinjukko. Aparam aa topic-a oru friendly tutor maari "
+            "step-by-step explain pannu: concept enna, epdi work aaguthu, "
+            "formula ya diagram iruntha atha kuda clearly explain pannu. "
+            "NCERT Class 10 Science context-la sollu."
         )
     try:
         resp = client.chat.completions.create(
@@ -137,7 +126,7 @@ def get_vision_response(image_bytes, mime_type, question, language, chapter):
                     {"type": "text", "text": question},
                 ]},
             ],
-            max_tokens=1024,
+            max_tokens=2048,
         )
         return resp.choices[0].message.content
     except Exception as e:
@@ -271,14 +260,6 @@ last_idx = len(st.session_state.messages) - 1
 for i, msg in enumerate(st.session_state.messages):
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
-        # Show diagram expander only under the latest assistant message
-        if msg["role"] == "assistant" and i == last_idx:
-            with st.expander("📊 See related diagram"):
-                img_url, caption = get_chapter_diagram(st.session_state.chapter)
-                if img_url:
-                    st.image(img_url, caption=caption, use_container_width=True)
-                else:
-                    st.caption("No diagram found for this chapter.")
 
 # --- Handle pending voice input ---
 if st.session_state.pending_voice:
