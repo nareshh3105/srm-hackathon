@@ -3,6 +3,8 @@ import base64
 import io
 import json
 import os
+import uuid
+from datetime import datetime
 import streamlit as st
 import streamlit.components.v1 as components
 from groq import Groq
@@ -105,6 +107,17 @@ st.markdown("""
             border-color: #c0392b !important;
         }
 
+        /* History buttons override — grey, not red */
+        section[data-testid="stSidebar"] div[data-testid="stButton"] button[kind="secondary"] {
+            color: #3b3b5c !important;
+            border-color: #c5cadf !important;
+        }
+        section[data-testid="stSidebar"] div[data-testid="stButton"] button[kind="secondary"]:hover {
+            background: #667eea !important;
+            color: white !important;
+            border-color: #667eea !important;
+        }
+
         [data-testid="stChatInput"] {
             background: #ffffff !important;
             border: 1.5px solid #c5cadf !important;
@@ -134,32 +147,91 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- Persistent Chat History ---
-HISTORY_FILE = "chat_history.json"
+# --- Multi-Session Chat History ---
+SESSIONS_FILE = "chat_sessions.json"
 
-def load_history():
-    """Load chat history from disk. Returns empty list if file missing/corrupt."""
+
+def _new_session_id():
+    return str(uuid.uuid4())
+
+
+def _session_title(messages):
+    """Use first user message as session title (truncated to 50 chars)."""
+    for m in messages:
+        if m["role"] == "user":
+            text = m["content"].lstrip("🎤 📎 📄").strip()
+            return text[:50] + ("…" if len(text) > 50 else "")
+    return "New Chat"
+
+
+def load_sessions_data():
+    """Load all sessions from disk. Migrates old chat_history.json if needed."""
     try:
-        if os.path.exists(HISTORY_FILE):
-            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+        if os.path.exists(SESSIONS_FILE):
+            with open(SESSIONS_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                if isinstance(data, list):
+                if isinstance(data, dict) and "sessions" in data:
                     return data
     except Exception:
         pass
-    return []
-
-def save_history(messages):
-    """Persist chat history to disk."""
+    # Migrate old single-session file if it exists
+    old_messages = []
     try:
-        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
-            json.dump(messages, f, ensure_ascii=False, indent=2)
+        if os.path.exists("chat_history.json"):
+            with open("chat_history.json", "r", encoding="utf-8") as f:
+                old_messages = json.load(f)
+                if not isinstance(old_messages, list):
+                    old_messages = []
+    except Exception:
+        pass
+    new_id = _new_session_id()
+    sessions = []
+    if old_messages:
+        sessions = [{"id": new_id, "title": _session_title(old_messages),
+                     "created_at": datetime.now().isoformat(), "messages": old_messages}]
+    return {"current_id": new_id, "sessions": sessions}
+
+
+def save_sessions_data(data):
+    """Persist all sessions to disk."""
+    try:
+        with open(SESSIONS_FILE, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
 
+
+def sync_current_session():
+    """Sync current session messages into sessions_data and save to disk."""
+    data = st.session_state._sessions_data
+    cid = st.session_state.current_session_id
+    messages = st.session_state.messages
+    for s in data["sessions"]:
+        if s["id"] == cid:
+            s["messages"] = messages
+            s["title"] = _session_title(messages)
+            break
+    save_sessions_data(data)
+
 # --- Session State ---
+if "_sessions_data" not in st.session_state:
+    _data = load_sessions_data()
+    if not _data.get("sessions"):
+        _new_id = _new_session_id()
+        _data["sessions"] = [{"id": _new_id, "title": "New Chat",
+                               "created_at": datetime.now().isoformat(), "messages": []}]
+        _data["current_id"] = _new_id
+    elif not _data.get("current_id") or not any(s["id"] == _data["current_id"] for s in _data["sessions"]):
+        _data["current_id"] = _data["sessions"][-1]["id"]
+    st.session_state._sessions_data = _data
+    st.session_state.current_session_id = _data["current_id"]
+    _current = next((s for s in _data["sessions"] if s["id"] == st.session_state.current_session_id),
+                    _data["sessions"][0])
+    st.session_state.messages = _current["messages"]
+if "current_session_id" not in st.session_state:
+    st.session_state.current_session_id = st.session_state._sessions_data["current_id"]
 if "messages" not in st.session_state:
-    st.session_state.messages = load_history()
+    st.session_state.messages = []
 if "subject" not in st.session_state:
     st.session_state.subject = SUBJECTS[0]
 if "chapter" not in st.session_state:
@@ -271,6 +343,22 @@ def get_response(user_message, language, subject, chapter):
 with st.sidebar:
     st.title("⚙️ Settings")
 
+    if st.button("✏️ New Chat", use_container_width=True, type="primary"):
+        sync_current_session()
+        _nid = _new_session_id()
+        _new_sess = {"id": _nid, "title": "New Chat",
+                     "created_at": datetime.now().isoformat(), "messages": []}
+        st.session_state._sessions_data["sessions"].append(_new_sess)
+        st.session_state._sessions_data["current_id"] = _nid
+        st.session_state.current_session_id = _nid
+        st.session_state.messages = []
+        st.session_state.pdf_context = None
+        st.session_state.uploaded_img = None
+        save_sessions_data(st.session_state._sessions_data)
+        st.rerun()
+
+    st.divider()
+
     selected_language = st.radio(
         "🌐 Language / भाषा",
         LANGUAGES,
@@ -288,6 +376,19 @@ with st.sidebar:
         index=SUBJECTS.index(st.session_state.subject),
     )
     if selected_subject != st.session_state.subject:
+        # Save current chat to history, start fresh for the new subject
+        if st.session_state.messages:
+            sync_current_session()
+            _nid = _new_session_id()
+            _new_sess = {"id": _nid, "title": "New Chat",
+                         "created_at": datetime.now().isoformat(), "messages": []}
+            st.session_state._sessions_data["sessions"].append(_new_sess)
+            st.session_state._sessions_data["current_id"] = _nid
+            st.session_state.current_session_id = _nid
+            st.session_state.messages = []
+            st.session_state.pdf_context = None
+            st.session_state.uploaded_img = None
+            save_sessions_data(st.session_state._sessions_data)
         st.session_state.subject = selected_subject
         st.session_state.chapter = SUBJECT_CHAPTERS[selected_subject][0]
         st.rerun()
@@ -309,10 +410,30 @@ with st.sidebar:
 
     if st.button("🗑️ Clear Chat", use_container_width=True):
         st.session_state.messages = []
-        save_history([])
+        sync_current_session()
         st.session_state.pdf_context = None
         st.session_state.uploaded_img = None
         st.rerun()
+
+    # --- History Panel ---
+    past_sessions = [
+        s for s in st.session_state._sessions_data.get("sessions", [])
+        if s["id"] != st.session_state.current_session_id and s.get("messages")
+    ]
+    if past_sessions:
+        st.divider()
+        st.markdown("**💬 History**")
+        for s in reversed(past_sessions):
+            label = s.get("title") or "Chat"
+            if st.button(f"📝 {label}", key=f"hist_{s['id']}", use_container_width=True):
+                sync_current_session()
+                st.session_state._sessions_data["current_id"] = s["id"]
+                st.session_state.current_session_id = s["id"]
+                st.session_state.messages = s["messages"]
+                st.session_state.pdf_context = None
+                st.session_state.uploaded_img = None
+                save_sessions_data(st.session_state._sessions_data)
+                st.rerun()
 
     st.divider()
     st.caption("Built with Streamlit + Groq AI")
@@ -348,7 +469,7 @@ if not st.session_state.messages:
             with st.spinner(spinner_text):
                 response = get_response(q, st.session_state.language, st.session_state.subject, st.session_state.chapter)
             st.session_state.messages.append({"role": "assistant", "content": response})
-            save_history(st.session_state.messages)
+            sync_current_session()
             st.rerun()
 
 # --- Language-switch regeneration (runs in main area, not sidebar) ---
@@ -369,7 +490,7 @@ if st.session_state.regen_lang:
             with st.spinner(spin):
                 new_resp = get_response(clean, st.session_state.language, st.session_state.subject, st.session_state.chapter)
             st.session_state.messages.append({"role": "assistant", "content": new_resp})
-            save_history(st.session_state.messages)
+            sync_current_session()
             st.rerun()
 
 # --- Chat Messages ---
@@ -393,7 +514,7 @@ if st.session_state.pending_voice:
             response = get_response(user_input, st.session_state.language, st.session_state.subject, st.session_state.chapter)
         st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
-    save_history(st.session_state.messages)
+    sync_current_session()
 
 # --- Chat Input with file attachment ---
 accepted_types = ["png", "jpg", "jpeg", "pdf"] if PDF_SUPPORT else ["png", "jpg", "jpeg"]
@@ -426,7 +547,7 @@ if result:
                         response = get_response(text or "Summarize this document briefly.", st.session_state.language, st.session_state.subject, st.session_state.chapter)
                     st.markdown(response)
                 st.session_state.messages.append({"role": "assistant", "content": response})
-                save_history(st.session_state.messages)
+                sync_current_session()
             else:
                 st.error("Couldn't read this PDF. Try an image instead.")
         else:
@@ -443,7 +564,7 @@ if result:
                     response = get_vision_response(file_bytes, file.type, text, st.session_state.language, st.session_state.subject, st.session_state.chapter)
                 st.markdown(response)
             st.session_state.messages.append({"role": "assistant", "content": response})
-            save_history(st.session_state.messages)
+            sync_current_session()
 
     elif text:
         # Text only
@@ -455,7 +576,7 @@ if result:
                 response = get_response(text, st.session_state.language, st.session_state.subject, st.session_state.chapter)
             st.markdown(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
-        save_history(st.session_state.messages)
+        sync_current_session()
 
 # --- Floating Mic Button (dynamically positioned next to the send button) ---
 components.html("""
