@@ -14,7 +14,8 @@ except ImportError:
     PDF_SUPPORT = False
 
 from config import (
-    GROQ_API_KEY, MODEL_NAME, CHAPTERS, LANGUAGES,
+    GROQ_API_KEY, MODEL_NAME, LANGUAGES,
+    SUBJECTS, SUBJECT_CHAPTERS,
     get_starter_questions,
 )
 from prompts import get_system_prompt
@@ -23,7 +24,7 @@ VISION_MODEL = "meta-llama/llama-4-scout-17b-16e-instruct"
 
 # --- Page Config ---
 st.set_page_config(
-    page_title="PadhAI - NCERT Class 10 Science Tutor",
+    page_title="PadhAI - NCERT Class 10 Tutor",
     page_icon="📚",
     layout="centered",
 )
@@ -159,8 +160,10 @@ def save_history(messages):
 # --- Session State ---
 if "messages" not in st.session_state:
     st.session_state.messages = load_history()
+if "subject" not in st.session_state:
+    st.session_state.subject = SUBJECTS[0]
 if "chapter" not in st.session_state:
-    st.session_state.chapter = CHAPTERS[0]
+    st.session_state.chapter = SUBJECT_CHAPTERS[SUBJECTS[0]][0]
 if "language" not in st.session_state:
     st.session_state.language = LANGUAGES[0]
 if "pending_voice" not in st.session_state:
@@ -194,9 +197,9 @@ def extract_pdf_text(pdf_bytes):
         return None
 
 
-def get_vision_response(image_bytes, mime_type, question, language, chapter):
+def get_vision_response(image_bytes, mime_type, question, language, subject, chapter):
     """Send image to Groq Vision and return explanation."""
-    system_prompt = get_system_prompt(language, chapter)
+    system_prompt = get_system_prompt(language, subject, chapter)
     b64 = base64.b64encode(image_bytes).decode()
     if not question or not question.strip():
         question = (
@@ -229,9 +232,9 @@ def get_vision_response(image_bytes, mime_type, question, language, chapter):
         return f"⚠️ Vision error: {e}"
 
 
-def get_response(user_message, language, chapter):
+def get_response(user_message, language, subject, chapter):
     """Send message to Groq and return the response."""
-    system_prompt = get_system_prompt(language, chapter)
+    system_prompt = get_system_prompt(language, subject, chapter)
     messages = [{"role": "system", "content": system_prompt}]
 
     # Inject PDF context if a document is loaded
@@ -279,10 +282,25 @@ with st.sidebar:
         st.session_state.regen_lang = True   # flag — regenerate in main area
         st.rerun()
 
+    selected_subject = st.selectbox(
+        "📚 Subject",
+        SUBJECTS,
+        index=SUBJECTS.index(st.session_state.subject),
+    )
+    if selected_subject != st.session_state.subject:
+        st.session_state.subject = selected_subject
+        st.session_state.chapter = SUBJECT_CHAPTERS[selected_subject][0]
+        st.rerun()
+
+    chapter_list = SUBJECT_CHAPTERS[st.session_state.subject]
+    # If stored chapter doesn't belong to current subject, reset it
+    if st.session_state.chapter not in chapter_list:
+        st.session_state.chapter = chapter_list[0]
+
     selected_chapter = st.selectbox(
         "📖 Chapter",
-        CHAPTERS,
-        index=CHAPTERS.index(st.session_state.chapter),
+        chapter_list,
+        index=chapter_list.index(st.session_state.chapter),
     )
     if selected_chapter != st.session_state.chapter:
         st.session_state.chapter = selected_chapter
@@ -304,31 +322,31 @@ with st.sidebar:
 st.markdown("""
 <div class="main-header">
     <h1>📚 PadhAI</h1>
-    <p>Your AI tutor for NCERT Class 10 Science — in your language!</p>
+    <p>Your AI tutor for NCERT Class 10 — in your language!</p>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown(
-    f'<div style="text-align:center"><span class="chapter-badge">📖 {st.session_state.chapter}</span></div>',
+    f'<div style="text-align:center"><span class="chapter-badge">📖 {st.session_state.subject} › {st.session_state.chapter}</span></div>',
     unsafe_allow_html=True
 )
 
 # --- Starter Questions (show only when chat is empty) ---
 if not st.session_state.messages:
     if st.session_state.language == "Hinglish":
-        welcome = "👋 Namaste! Main tera Class 10 Science ka personal tutor hoon.<br>Koi bhi doubt pooch — Hinglish mein samjhunga! 🎓"
+        welcome = f"👋 Namaste! Main tera Class 10 {st.session_state.subject} ka personal tutor hoon.<br>Koi bhi doubt pooch — Hinglish mein samjhunga! 🎓"
     else:
-        welcome = "👋 Vanakkam! Naan unoda Class 10 Science personal tutor.<br>Enna doubt-um kekko — Tanglish-la solluven! 🎓"
+        welcome = f"👋 Vanakkam! Naan unoda Class 10 {st.session_state.subject} personal tutor.<br>Enna doubt-um kekko — Tanglish-la solluven! 🎓"
     st.markdown(f'<div class="welcome-box">{welcome}</div>', unsafe_allow_html=True)
 
     st.markdown("**💡 Try asking:**")
-    chapter_questions = get_starter_questions(st.session_state.language, st.session_state.chapter)
+    chapter_questions = get_starter_questions(st.session_state.language, st.session_state.subject, st.session_state.chapter)
     for i, q in enumerate(chapter_questions):
         if st.button(f" {q}", key=f"starter_{i}", use_container_width=True):
             st.session_state.messages.append({"role": "user", "content": q})
             spinner_text = "Soch raha hoon... 🤔" if st.session_state.language == "Hinglish" else "Yosikirein... 🤔"
             with st.spinner(spinner_text):
-                response = get_response(q, st.session_state.language, st.session_state.chapter)
+                response = get_response(q, st.session_state.language, st.session_state.subject, st.session_state.chapter)
             st.session_state.messages.append({"role": "assistant", "content": response})
             save_history(st.session_state.messages)
             st.rerun()
@@ -349,7 +367,7 @@ if st.session_state.regen_lang:
             spin = "Translate kar raha hoon... 🔄" if st.session_state.language == "Hinglish" else "Maarikirein... 🔄"
             st.session_state.messages.pop()   # remove old-language reply so it doesn't bias the model
             with st.spinner(spin):
-                new_resp = get_response(clean, st.session_state.language, st.session_state.chapter)
+                new_resp = get_response(clean, st.session_state.language, st.session_state.subject, st.session_state.chapter)
             st.session_state.messages.append({"role": "assistant", "content": new_resp})
             save_history(st.session_state.messages)
             st.rerun()
@@ -372,7 +390,7 @@ if st.session_state.pending_voice:
     spinner_text = "Soch raha hoon... 🤔" if st.session_state.language == "Hinglish" else "Yosikirein... 🤔"
     with st.chat_message("assistant"):
         with st.spinner(spinner_text):
-            response = get_response(user_input, st.session_state.language, st.session_state.chapter)
+            response = get_response(user_input, st.session_state.language, st.session_state.subject, st.session_state.chapter)
         st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
     save_history(st.session_state.messages)
@@ -405,7 +423,7 @@ if result:
                     st.markdown(user_label)
                 with st.chat_message("assistant"):
                     with st.spinner(spinner_text):
-                        response = get_response(text or "Summarize this document briefly.", st.session_state.language, st.session_state.chapter)
+                        response = get_response(text or "Summarize this document briefly.", st.session_state.language, st.session_state.subject, st.session_state.chapter)
                     st.markdown(response)
                 st.session_state.messages.append({"role": "assistant", "content": response})
                 save_history(st.session_state.messages)
@@ -422,7 +440,7 @@ if result:
                     st.markdown(text)
             with st.chat_message("assistant"):
                 with st.spinner(spinner_text):
-                    response = get_vision_response(file_bytes, file.type, text, st.session_state.language, st.session_state.chapter)
+                    response = get_vision_response(file_bytes, file.type, text, st.session_state.language, st.session_state.subject, st.session_state.chapter)
                 st.markdown(response)
             st.session_state.messages.append({"role": "assistant", "content": response})
             save_history(st.session_state.messages)
@@ -434,7 +452,7 @@ if result:
             st.markdown(text)
         with st.chat_message("assistant"):
             with st.spinner("Soch raha hoon... 🤔" if st.session_state.language == "Hinglish" else "Yosikirein... 🤔"):
-                response = get_response(text, st.session_state.language, st.session_state.chapter)
+                response = get_response(text, st.session_state.language, st.session_state.subject, st.session_state.chapter)
             st.markdown(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
         save_history(st.session_state.messages)
