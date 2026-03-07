@@ -34,19 +34,11 @@ client = Groq(api_key=GROQ_API_KEY)
 # --- Custom CSS ---
 st.markdown("""
 <style>
-    /* ── Page background ── */
-    .stApp { background-color: #f0f2f8 !important; }
-    section[data-testid="stSidebar"] { background-color: #e8eaf2 !important; }
+    /* ── Always: structural + branded elements ── */
+    .main-header { text-align: center; padding: 1rem 0 0.5rem 0; }
+    .main-header h1 { font-size: 2.5rem; margin-bottom: 0; }
+    .main-header p  { font-size: 1rem; margin-top: 0.25rem; }
 
-    /* ── Header ── */
-    .main-header {
-        text-align: center;
-        padding: 1rem 0 0.5rem 0;
-    }
-    .main-header h1 { font-size: 2.5rem; margin-bottom: 0; color: #1e1e2e; }
-    .main-header p  { color: #555; font-size: 1rem; margin-top: 0.25rem; }
-
-    /* ── Chapter badge ── */
     .chapter-badge {
         display: inline-block;
         background: linear-gradient(135deg, #667eea, #764ba2);
@@ -58,7 +50,6 @@ st.markdown("""
         margin-bottom: 1rem;
     }
 
-    /* ── Welcome box ── */
     .welcome-box {
         background: linear-gradient(135deg, #667eea, #764ba2);
         border-radius: 12px;
@@ -69,20 +60,12 @@ st.markdown("""
         box-shadow: 0 4px 16px rgba(102,126,234,0.35);
     }
 
-    /* ── Chat messages ── */
     [data-testid="stChatMessage"] {
         border-radius: 12px !important;
-        background: #ffffff !important;
-        border: 1px solid #dde1ef !important;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.07) !important;
         margin-bottom: 6px !important;
     }
 
-    /* ── Starter question buttons ── */
     div[data-testid="stButton"] button {
-        background: #ffffff !important;
-        color: #3b3b5c !important;
-        border: 1.5px solid #c5cadf !important;
         border-radius: 10px !important;
         font-weight: 500 !important;
         transition: all 0.18s !important;
@@ -93,38 +76,59 @@ st.markdown("""
         border-color: #667eea !important;
     }
 
-    /* ── Sidebar buttons (Clear Chat) ── */
-    section[data-testid="stSidebar"] div[data-testid="stButton"] button {
-        background: #ffffff !important;
-        color: #c0392b !important;
-        border: 1.5px solid #e0c5c5 !important;
-    }
-    section[data-testid="stSidebar"] div[data-testid="stButton"] button:hover {
-        background: #c0392b !important;
-        color: white !important;
-        border-color: #c0392b !important;
+    /* ── Light mode overrides ── */
+    @media (prefers-color-scheme: light) {
+        .stApp { background-color: #f0f2f8 !important; }
+        section[data-testid="stSidebar"] { background-color: #e8eaf2 !important; }
+        .main-header h1 { color: #1e1e2e; }
+        .main-header p  { color: #555; }
+
+        [data-testid="stChatMessage"] {
+            background: #ffffff !important;
+            border: 1px solid #dde1ef !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07) !important;
+        }
+
+        div[data-testid="stButton"] button {
+            background: #ffffff !important;
+            color: #3b3b5c !important;
+            border: 1.5px solid #c5cadf !important;
+        }
+
+        section[data-testid="stSidebar"] div[data-testid="stButton"] button {
+            color: #c0392b !important;
+            border-color: #e0c5c5 !important;
+        }
+        section[data-testid="stSidebar"] div[data-testid="stButton"] button:hover {
+            background: #c0392b !important;
+            border-color: #c0392b !important;
+        }
+
+        [data-testid="stChatInput"] {
+            background: #ffffff !important;
+            border: 1.5px solid #c5cadf !important;
+            border-radius: 14px !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+        }
+
+        .stBottom > div {
+            background: #f0f2f8 !important;
+            border-top: 1px solid #dde1ef !important;
+        }
+
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] .stRadio,
+        section[data-testid="stSidebar"] p {
+            color: #2c2c54 !important;
+        }
     }
 
-    /* ── Chat input box ── */
-    [data-testid="stChatInput"] {
-        background: #ffffff !important;
-        border: 1.5px solid #c5cadf !important;
-        border-radius: 14px !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
-    }
-
-    /* ── Bottom fixed chat bar background ── */
-    .stBottom > div {
-        background: #f0f2f8 !important;
-        border-top: 1px solid #dde1ef !important;
-        padding-top: 8px !important;
-    }
-
-    /* ── Sidebar text ── */
-    section[data-testid="stSidebar"] label,
-    section[data-testid="stSidebar"] .stRadio,
-    section[data-testid="stSidebar"] p {
-        color: #2c2c54 !important;
+    /* ── Dark mode enhancements ── */
+    @media (prefers-color-scheme: dark) {
+        [data-testid="stChatMessage"] {
+            border: 1px solid rgba(255,255,255,0.07) !important;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.35) !important;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
