@@ -171,6 +171,25 @@ STARTER_QUESTIONS_TANGLISH = {
     ],
 }
 
+# Wikipedia article titles for chapter diagrams (used by get_chapter_diagram)
+CHAPTER_WIKI_MAP = {
+    "Chemical Reactions and Equations": "Chemical_reaction",
+    "Acids, Bases and Salts": "Acid%E2%80%93base_reaction",
+    "Metals and Non-metals": "Metal",
+    "Carbon and its Compounds": "Carbon",
+    "Life Processes": "Photosynthesis",
+    "Control and Coordination": "Neuron",
+    "How do Organisms Reproduce": "Reproduction",
+    "Heredity": "Heredity",
+    "Light - Reflection and Refraction": "Reflection_(physics)",
+    "The Human Eye and the Colourful World": "Human_eye",
+    "Electricity": "Electric_circuit",
+    "Magnetic Effects of Electric Current": "Magnetic_field",
+    "Our Environment": "Food_web",
+    "Sustainable Management of Natural Resources": "Natural_resource_management",
+}
+
+
 def get_starter_questions(language: str, chapter: str) -> list:
     if language == "Tanglish":
         return STARTER_QUESTIONS_TANGLISH.get(chapter, [])
