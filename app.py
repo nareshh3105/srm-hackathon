@@ -1,6 +1,8 @@
 import time
 import base64
 import io
+import json
+import os
 import streamlit as st
 import streamlit.components.v1 as components
 from groq import Groq
@@ -60,9 +62,32 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# --- Persistent Chat History ---
+HISTORY_FILE = "chat_history.json"
+
+def load_history():
+    """Load chat history from disk. Returns empty list if file missing/corrupt."""
+    try:
+        if os.path.exists(HISTORY_FILE):
+            with open(HISTORY_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                if isinstance(data, list):
+                    return data
+    except Exception:
+        pass
+    return []
+
+def save_history(messages):
+    """Persist chat history to disk."""
+    try:
+        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+            json.dump(messages, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
 # --- Session State ---
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = load_history()
 if "chapter" not in st.session_state:
     st.session_state.chapter = CHAPTERS[0]
 if "language" not in st.session_state:
@@ -195,6 +220,7 @@ with st.sidebar:
 
     if st.button("🗑️ Clear Chat", use_container_width=True):
         st.session_state.messages = []
+        save_history([])
         st.session_state.pdf_context = None
         st.session_state.uploaded_img = None
         st.rerun()
@@ -233,6 +259,7 @@ if not st.session_state.messages:
             with st.spinner(spinner_text):
                 response = get_response(q, st.session_state.language, st.session_state.chapter)
             st.session_state.messages.append({"role": "assistant", "content": response})
+            save_history(st.session_state.messages)
             st.rerun()
 
 # --- Language-switch regeneration (runs in main area, not sidebar) ---
@@ -253,6 +280,7 @@ if st.session_state.regen_lang:
             with st.spinner(spin):
                 new_resp = get_response(clean, st.session_state.language, st.session_state.chapter)
             st.session_state.messages.append({"role": "assistant", "content": new_resp})
+            save_history(st.session_state.messages)
             st.rerun()
 
 # --- Chat Messages ---
@@ -276,6 +304,7 @@ if st.session_state.pending_voice:
             response = get_response(user_input, st.session_state.language, st.session_state.chapter)
         st.markdown(response)
     st.session_state.messages.append({"role": "assistant", "content": response})
+    save_history(st.session_state.messages)
 
 # --- Chat Input with file attachment ---
 accepted_types = ["png", "jpg", "jpeg", "pdf"] if PDF_SUPPORT else ["png", "jpg", "jpeg"]
@@ -308,6 +337,7 @@ if result:
                         response = get_response(text or "Summarize this document briefly.", st.session_state.language, st.session_state.chapter)
                     st.markdown(response)
                 st.session_state.messages.append({"role": "assistant", "content": response})
+                save_history(st.session_state.messages)
             else:
                 st.error("Couldn't read this PDF. Try an image instead.")
         else:
@@ -324,6 +354,7 @@ if result:
                     response = get_vision_response(file_bytes, file.type, text, st.session_state.language, st.session_state.chapter)
                 st.markdown(response)
             st.session_state.messages.append({"role": "assistant", "content": response})
+            save_history(st.session_state.messages)
 
     elif text:
         # Text only
@@ -335,6 +366,7 @@ if result:
                 response = get_response(text, st.session_state.language, st.session_state.chapter)
             st.markdown(response)
         st.session_state.messages.append({"role": "assistant", "content": response})
+        save_history(st.session_state.messages)
 
 # --- Floating Mic Button (dynamically positioned next to the send button) ---
 components.html("""
