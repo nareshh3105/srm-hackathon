@@ -1,8 +1,14 @@
 # Studybuddy AI
 
+<p align="center">
+  <img src="mascot.png" width="100" alt="Studybuddy AI mascot"/>
+</p>
+
 An AI-powered NCERT tutoring chatbot that explains concepts in **Hinglish** (Hindi + English) and **Tanglish** (Tamil + English) — the way students actually talk.
 
 Built with **Streamlit** + **Groq AI** (LLaMA 3.3 70B).
+
+**Live app: [studybuddy-ai-ncert.streamlit.app](https://studybuddy-ai-ncert.streamlit.app)**
 
 ---
 
