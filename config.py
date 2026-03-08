@@ -4,11 +4,241 @@ from dotenv import load_dotenv
 load_dotenv()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-MODEL_NAME = "llama-3.3-70b-versatile"
+MODEL_NAME   = "llama-3.3-70b-versatile"
+LANGUAGES    = ["Hinglish", "Tanglish"]
 
-SUBJECTS = ["Science", "Social Science", "Mathematics", "English", "Hindi", "Tamil"]
+# ── Class & Group structure ──────────────────────────────────────────────────
+CLASSES      = ["Class 8", "Class 9", "Class 10", "Class 11", "Class 12"]
+GROUPS_11_12 = ["Bio-Maths", "Computer Science", "Commerce"]
 
-SUBJECT_CHAPTERS = {
+SUBJECTS_8_10 = ["Science", "Social Science", "Mathematics", "English", "Hindi", "Tamil"]
+
+SUBJECTS_11_12 = {
+    "Bio-Maths":        ["Physics", "Chemistry", "Biology", "Mathematics", "English"],
+    "Computer Science": ["Physics", "Chemistry", "Mathematics", "Computer Science", "English"],
+    "Commerce":         ["Business Studies", "Economics", "Accountancy", "Mathematics", "English"],
+}
+
+# ── Chapter lists ────────────────────────────────────────────────────────────
+
+_CHAPTERS_8 = {
+    "Science": [
+        "Crop Production and Management",
+        "Microorganisms: Friend and Foe",
+        "Synthetic Fibres and Plastics",
+        "Materials: Metals and Non-Metals",
+        "Coal and Petroleum",
+        "Combustion and Flame",
+        "Conservation of Plants and Animals",
+        "Cell - Structure and Functions",
+        "Reproduction in Animals",
+        "Reaching the Age of Adolescence",
+        "Force and Pressure",
+        "Friction",
+        "Sound",
+        "Chemical Effects of Electric Current",
+        "Some Natural Phenomena",
+        "Light",
+    ],
+    "Social Science": [
+        "History: How, When and Where",
+        "History: From Trade to Territory",
+        "History: Ruling the Countryside",
+        "History: Tribals, Dikus and the Vision of a Golden Age",
+        "History: When People Rebel",
+        "History: Weavers, Iron Smelters and Factory Owners",
+        "History: Civilising the Native, Educating the Nation",
+        "History: Women, Caste and Reform",
+        "History: The Making of the National Movement",
+        "History: India After Independence",
+        "Geography: Resources",
+        "Geography: Land, Soil, Water, Natural Vegetation and Wildlife",
+        "Geography: Mineral and Power Resources",
+        "Geography: Agriculture",
+        "Geography: Industries",
+        "Geography: Human Resources",
+        "Civics: The Indian Constitution",
+        "Civics: Understanding Secularism",
+        "Civics: Why Do We Need a Parliament",
+        "Civics: Understanding Laws",
+        "Civics: Judiciary",
+        "Civics: Understanding Our Criminal Justice System",
+        "Civics: Understanding Marginalisation",
+        "Civics: Confronting Marginalisation",
+        "Civics: Public Facilities",
+        "Civics: Law and Social Justice",
+    ],
+    "Mathematics": [
+        "Rational Numbers",
+        "Linear Equations in One Variable",
+        "Understanding Quadrilaterals",
+        "Data Handling",
+        "Squares and Square Roots",
+        "Cubes and Cube Roots",
+        "Comparing Quantities",
+        "Algebraic Expressions and Identities",
+        "Mensuration",
+        "Exponents and Powers",
+        "Direct and Inverse Proportions",
+        "Factorisation",
+        "Introduction to Graphs",
+    ],
+    "English": [
+        "Honeydew: The Best Christmas Present in the World",
+        "Honeydew: The Tsunami",
+        "Honeydew: Glimpses of the Past",
+        "Honeydew: Bepin Choudhury's Lapse of Memory",
+        "Honeydew: The Summit Within",
+        "Honeydew: This is Jody's Fawn",
+        "Honeydew: A Visit to Cambridge",
+        "Honeydew: A Short Monsoon Diary",
+        "It So Happened: How the Camel Got His Hump",
+        "It So Happened: Children at Work",
+        "It So Happened: The Selfish Giant",
+        "It So Happened: The Treasure Within",
+        "It So Happened: Princess September",
+        "It So Happened: The Fight",
+        "It So Happened: The Open Window",
+        "It So Happened: Jalebis",
+    ],
+    "Hindi": [
+        "Vasant: Dhwani",
+        "Vasant: Lakh ki Chudiyan",
+        "Vasant: Bus ki Yatra",
+        "Vasant: Diwanon ki Hasti",
+        "Vasant: Chitthiyon ki Anoothi Duniya",
+        "Vasant: Bhagwan ke Dakiye",
+        "Vasant: Kya Nirash Hua Jaye",
+        "Vasant: Yeh Sabse Kathin Samay Nahin",
+        "Vasant: Kabir ki Sakhiyan",
+        "Vasant: Kamchor",
+        "Vasant: Jab Cinema ne Bolna Seekha",
+        "Vasant: Sudama Charit",
+        "Vasant: Jahan Pahiya Hai",
+        "Vasant: Akbari Lota",
+        "Vasant: Sur ke Pad",
+        "Vasant: Paani ki Kahani",
+        "Durva: Chapters (Various)",
+    ],
+    "Tamil": [
+        "Iyal 1: Mudhal Padalam",
+        "Iyal 2: Irandaam Padalam",
+        "Iyal 3: Moondram Padalam",
+        "Iyal 4: Nankam Padalam",
+        "Iyal 5: Aindham Padalam",
+        "Tamil Grammar: Ezhuttu",
+        "Tamil Grammar: Sol",
+        "Tamil Grammar: Porul",
+    ],
+}
+
+_CHAPTERS_9 = {
+    "Science": [
+        "Matter in Our Surroundings",
+        "Is Matter Around Us Pure",
+        "Atoms and Molecules",
+        "Structure of the Atom",
+        "The Fundamental Unit of Life",
+        "Tissues",
+        "Motion",
+        "Force and Laws of Motion",
+        "Gravitation",
+        "Work and Energy",
+        "Sound",
+        "Improvement in Food Resources",
+    ],
+    "Social Science": [
+        "History: The French Revolution",
+        "History: Socialism in Europe and the Russian Revolution",
+        "History: Nazism and the Rise of Hitler",
+        "History: Forest Society and Colonialism",
+        "History: Pastoralists in the Modern World",
+        "Geography: India - Size and Location",
+        "Geography: Physical Features of India",
+        "Geography: Drainage",
+        "Geography: Climate",
+        "Geography: Natural Vegetation and Wildlife",
+        "Geography: Population",
+        "Civics: What is Democracy? Why Democracy?",
+        "Civics: Constitutional Design",
+        "Civics: Electoral Politics",
+        "Civics: Working of Institutions",
+        "Civics: Democratic Rights",
+        "Economics: The Story of Village Palampur",
+        "Economics: People as Resource",
+        "Economics: Poverty as a Challenge",
+        "Economics: Food Security in India",
+    ],
+    "Mathematics": [
+        "Number Systems",
+        "Polynomials",
+        "Coordinate Geometry",
+        "Linear Equations in Two Variables",
+        "Introduction to Euclid's Geometry",
+        "Lines and Angles",
+        "Triangles",
+        "Quadrilaterals",
+        "Circles",
+        "Heron's Formula",
+        "Surface Areas and Volumes",
+        "Statistics",
+    ],
+    "English": [
+        "Beehive: The Fun They Had",
+        "Beehive: The Sound of Music",
+        "Beehive: The Little Girl",
+        "Beehive: A Truly Beautiful Mind",
+        "Beehive: The Snake and the Mirror",
+        "Beehive: My Childhood",
+        "Beehive: Packing",
+        "Beehive: Reach for the Top",
+        "Beehive: The Bond of Love",
+        "Beehive: Kathmandu",
+        "Beehive: If I Were You",
+        "Moments: The Lost Child",
+        "Moments: The Adventures of Toto",
+        "Moments: Iswaran the Storyteller",
+        "Moments: In the Kingdom of Fools",
+        "Moments: The Happy Prince",
+        "Moments: Weathering the Storm in Ersama",
+        "Moments: The Last Leaf",
+        "Moments: A House is Not a Home",
+        "Moments: The Accidental Tourist",
+        "Moments: The Beggar",
+    ],
+    "Hindi": [
+        "Kshitij: Surdas - Pad",
+        "Kshitij: Mirabai - Pad",
+        "Kshitij: Raidas - Pad",
+        "Kshitij: Kabirdas - Sakhiyan evam Sabad",
+        "Kshitij: Dharamvir Bharati - Agnipath",
+        "Kshitij: Harivansh Rai Bachchan - Madhushala",
+        "Kshitij: Mahadevi Verma - Ateet ke Chalchitr",
+        "Kshitij: Hazari Prasad Dwivedi - Kalaram",
+        "Kshitij: Premchand - Do Bailon ki Katha",
+        "Kshitij: Rahul Sankrityayan - Smritiyon ki Karwan",
+        "Kshitij: Shivpujan Sahay - Mera Chhota sa Niji Pulsataka",
+        "Kshitij: Mannu Bhandari - Kailash Mansarovar",
+        "Kritika: Is Jal Pralay Mein",
+        "Kritika: Mere Sang ki Auraten",
+        "Kritika: Reedh ki Haddi",
+        "Kritika: Maati wali",
+        "Kritika: Kis Tarah Aakhirkar Mein Hindi Mein Aaya",
+    ],
+    "Tamil": [
+        "Iyal 1: Mudhal Padalam",
+        "Iyal 2: Irandaam Padalam",
+        "Iyal 3: Moondram Padalam",
+        "Iyal 4: Nankam Padalam",
+        "Iyal 5: Aindham Padalam",
+        "Iyal 6: Aaram Padalam",
+        "Tamil Grammar: Ezhuttu",
+        "Tamil Grammar: Sol",
+        "Tamil Grammar: Porul",
+    ],
+}
+
+_CHAPTERS_10 = {
     "Science": [
         "Chemical Reactions and Equations",
         "Acids, Bases and Salts",
@@ -26,13 +256,11 @@ SUBJECT_CHAPTERS = {
         "Sustainable Management of Natural Resources",
     ],
     "Social Science": [
-        # History — India and the Contemporary World II
         "History: The Rise of Nationalism in Europe",
         "History: Nationalism in India",
         "History: The Making of a Global World",
         "History: The Age of Industrialisation",
         "History: Print Culture and the Modern World",
-        # Geography — Contemporary India II
         "Geography: Resources and Development",
         "Geography: Forest and Wildlife Resources",
         "Geography: Water Resources",
@@ -40,13 +268,14 @@ SUBJECT_CHAPTERS = {
         "Geography: Minerals and Energy Resources",
         "Geography: Manufacturing Industries",
         "Geography: Lifelines of National Economy",
-        # Civics — Democratic Politics II
         "Civics: Power Sharing",
         "Civics: Federalism",
+        "Civics: Democracy and Diversity",
         "Civics: Gender, Religion and Caste",
+        "Civics: Popular Struggles and Movements",
         "Civics: Political Parties",
         "Civics: Outcomes of Democracy",
-        # Economics — Understanding Economic Development
+        "Civics: Challenges to Democracy",
         "Economics: Development",
         "Economics: Sectors of the Indian Economy",
         "Economics: Money and Credit",
@@ -70,19 +299,15 @@ SUBJECT_CHAPTERS = {
         "Probability",
     ],
     "English": [
-        # First Flight — Main Reader
         "FF: A Letter to God",
         "FF: Nelson Mandela - Long Walk to Freedom",
-        "FF: Two Stories about Flying",
+        "FF: Two Stories About Flying",
         "FF: From the Diary of Anne Frank",
-        "FF: The Hundred Dresses-I",
-        "FF: The Hundred Dresses-II",
         "FF: Glimpses of India",
         "FF: Mijbil the Otter",
         "FF: Madam Rides the Bus",
         "FF: The Sermon at Benares",
         "FF: The Proposal",
-        # Footprints Without Feet — Supplementary
         "Footprints: A Triumph of Surgery",
         "Footprints: The Thief's Story",
         "Footprints: The Midnight Visitor",
@@ -95,1105 +320,828 @@ SUBJECT_CHAPTERS = {
         "Footprints: The Book That Saved the Earth",
     ],
     "Hindi": [
-        # Kshitij — Main Reader
         "Kshitij: Surdas - Pad",
-        "Kshitij: Tulsidas - Ram-Lakshman-Parashuram Samvad",
+        "Kshitij: Tulsidas - Ram-Lakshman-Parshuram Samvad",
         "Kshitij: Dev - Savaiya aur Kavitt",
-        "Kshitij: Jay Shankar Prasad - Aatm Parichay",
-        "Kshitij: Suryakant Tripathi Nirala - Utsaah",
-        "Kshitij: Nagarjun - Yeh Danturit Muskan",
+        "Kshitij: Jaishankar Prasad - Atmakadya",
+        "Kshitij: Suryakant Tripathi Nirala - Utsah aur At Nahi Rahi Hai",
+        "Kshitij: Nagarjun - Yeh Danturit Muskan aur Fasal",
+        "Kshitij: Girija Kumar Mathur - Chhaya Mat Chuna",
         "Kshitij: Rituraj - Kanyadan",
-        "Kshitij: Mangalesh Dabral - Sangatkar",
-        "Kshitij: Swayam Prakash - Netaji ka Chashma",
-        "Kshitij: Ramvriksh Benipuri - Balgobin Bhagat",
-        "Kshitij: Yadavendra Sharma - Lakhnavi Andaaz",
-        "Kshitij: Mannu Bhandari - Ek Kahani Yeh Bhi",
-        "Kshitij: Mahavir Prasad Dwivedi - Stri Shiksha",
-        # Kritika — Supplementary
-        "Kritika: Mata Ka Anchal",
-        "Kritika: George Pancham Ki Naak",
-        "Kritika: Sana-Sana Haath Jodi",
+        "Kshitij: Manglesh Dabral - Sangatkar",
+        "Kshitij: Swayyam Prakash - Netaji ka Chashma",
+        "Kshitij: Ramvriksha Benipuri - Balgobin Bhagat",
+        "Kshitij: Yashpal - Lucknow ki Bhool",
+        "Kshitij: Sarveshwar Dayal Saxena - Manviya Karuna ki Divya Chamak",
+        "Kshitij: Manu Bhandari - Ek Kahani Yeh Bhi",
+        "Kshitij: Mahavir Prasad Dwivedi - Stri Shiksha ke Virodhi Kutarkon ka Khandan",
+        "Kshitij: Yatindra Mishra - Naubatkhane Mein Ibadat",
+        "Kritika: Mata ka Anchal",
+        "Kritika: George Pancham ki Naak",
+        "Kritika: Sana Sana Hath Jodi",
+        "Kritika: Ahi Thaiya Jhulni Herani Ho Rama",
         "Kritika: Maine Dekha Ek Aandha Maidan",
     ],
     "Tamil": [
-        # TN Samacheer Kalvi Class 10 Tamil
         "Iyal 1: Karumai Niram",
-        "Iyal 2: Inaindha Kai",
-        "Iyal 3: Manidha Neyam",
-        "Iyal 4: Thamizhin Sirappu",
-        "Iyal 5: Bharathiyar Kavithaigal",
-        "Iyal 6: Thirukkural",
-        "Iyal 7: Sangam Ilakkiyam",
-        "Iyal 8: Naadaka Ilakkiyam",
-        "Iyal 9: Adutha Kathai",
-        "Tamil Grammar: Ezhuthu",
-        "Tamil Grammar: Sol",
+        "Iyal 2: Vazhkai Payiram",
+        "Iyal 3: Illam",
+        "Iyal 4: Veedu",
+        "Iyal 5: Maruthuvam",
+        "Iyal 6: Vivasayam",
+        "Iyal 7: Vilayattu",
+        "Iyal 8: Kalaigal",
         "Tamil Grammar: Tholkappiyam",
+        "Tamil Grammar: Idaichol",
+        "Tamil Grammar: Punarchi",
+        "Tamil Grammar: Porul Ilakkanam",
     ],
 }
 
-# Keep CHAPTERS pointing to Science for any legacy code
-CHAPTERS = SUBJECT_CHAPTERS["Science"]
+# ── Class 11 chapters ────────────────────────────────────────────────────────
 
-LANGUAGES = ["Hinglish", "Tanglish"]
+_PHY_11 = [
+    "Physical World",
+    "Units and Measurements",
+    "Motion in a Straight Line",
+    "Motion in a Plane",
+    "Laws of Motion",
+    "Work, Energy and Power",
+    "System of Particles and Rotational Motion",
+    "Gravitation",
+    "Mechanical Properties of Solids",
+    "Mechanical Properties of Fluids",
+    "Thermal Properties of Matter",
+    "Thermodynamics",
+    "Kinetic Theory",
+    "Oscillations",
+    "Waves",
+]
 
-# ─────────────────────────────────────────────
-# STARTER QUESTIONS — HINGLISH
-# ─────────────────────────────────────────────
+_CHEM_11 = [
+    "Some Basic Concepts of Chemistry",
+    "Structure of Atom",
+    "Classification of Elements and Periodicity in Properties",
+    "Chemical Bonding and Molecular Structure",
+    "Thermodynamics",
+    "Equilibrium",
+    "Redox Reactions",
+    "Organic Chemistry: Basic Principles and Techniques",
+    "Hydrocarbons",
+    "Environmental Chemistry",
+]
+
+_BIO_11 = [
+    "The Living World",
+    "Biological Classification",
+    "Plant Kingdom",
+    "Animal Kingdom",
+    "Morphology of Flowering Plants",
+    "Anatomy of Flowering Plants",
+    "Structural Organisation in Animals",
+    "Cell: The Unit of Life",
+    "Biomolecules",
+    "Cell Cycle and Cell Division",
+    "Photosynthesis in Higher Plants",
+    "Respiration in Plants",
+    "Plant Growth and Development",
+    "Digestion and Absorption",
+    "Breathing and Exchange of Gases",
+    "Body Fluids and Circulation",
+    "Excretory Products and their Elimination",
+    "Locomotion and Movement",
+    "Neural Control and Coordination",
+    "Chemical Coordination and Integration",
+]
+
+_MATH_11 = [
+    "Sets",
+    "Relations and Functions",
+    "Trigonometric Functions",
+    "Complex Numbers and Quadratic Equations",
+    "Linear Inequalities",
+    "Permutations and Combinations",
+    "Binomial Theorem",
+    "Sequences and Series",
+    "Straight Lines",
+    "Conic Sections",
+    "Introduction to Three Dimensional Geometry",
+    "Limits and Derivatives",
+    "Statistics",
+    "Probability",
+]
+
+_CS_11 = [
+    "Computer System",
+    "Encoding Schemes and Number System",
+    "Emerging Trends",
+    "Introduction to Problem Solving",
+    "Getting Started with Python",
+    "Flow of Control",
+    "Functions",
+    "Strings",
+    "Lists",
+    "Tuples and Dictionaries",
+    "Societal Impacts",
+]
+
+_ENG_11 = [
+    "Hornbill: The Portrait of a Lady",
+    "Hornbill: We're Not Afraid to Die",
+    "Hornbill: Discovering Tut: The Saga Continues",
+    "Hornbill: Landscape of the Soul",
+    "Hornbill: The Ailing Planet",
+    "Hornbill: The Browning Version",
+    "Hornbill: The Adventure",
+    "Hornbill: Silk Road",
+    "Snapshots: The Summer of the Beautiful White Horse",
+    "Snapshots: The Address",
+    "Snapshots: Ranga's Marriage",
+    "Snapshots: Albert Einstein at School",
+    "Snapshots: Mother's Day",
+    "Snapshots: The Ghat of the Only World",
+    "Snapshots: Birth",
+    "Snapshots: The Tale of Melon City",
+]
+
+_HINDI_11 = [
+    "Aroh: Hum Toh Ek Ek Kar Jananenge",
+    "Aroh: Meera ke Pad",
+    "Aroh: Pathik",
+    "Aroh: Veh Aankhein",
+    "Aroh: Ghar ki Yaad",
+    "Aroh: Chandragahana se Lautan Beli",
+    "Aroh: Janmajat",
+    "Aroh: Spiti Mein Baarish",
+    "Aroh: Rajasthan ki Rajdhani Jaipur",
+    "Aroh: Aao Milein Aashiqon Se",
+    "Aroh: Main Kyun Likhta Hoon",
+    "Vitan: Bhaarat Maata",
+    "Vitan: Rajasthan ki Rajdhani",
+    "Vitan: Aalo Aandhhari",
+]
+
+_TAMIL_11 = [
+    "Iyal 1: Mudhal Padalam",
+    "Iyal 2: Irandaam Padalam",
+    "Iyal 3: Moondram Padalam",
+    "Iyal 4: Nankam Padalam",
+    "Iyal 5: Aindham Padalam",
+    "Iyal 6: Aaram Padalam",
+    "Tamil Grammar: Ezhuttu Ilakkanam",
+    "Tamil Grammar: Sol Ilakkanam",
+    "Tamil Grammar: Porul Ilakkanam",
+    "Tamil Literature: Sangam Ilakkiyam",
+]
+
+_BS_11 = [
+    "Business, Trade and Commerce",
+    "Forms of Business Organisation",
+    "Public, Private and Global Enterprises",
+    "Business Services",
+    "Emerging Modes of Business",
+    "Social Responsibilities of Business and Business Ethics",
+    "Formation of a Company",
+    "Sources of Business Finance",
+    "Small Business",
+    "Internal Trade",
+    "International Business",
+]
+
+_ECO_11 = [
+    "Statistics: Introduction",
+    "Statistics: Collection of Data",
+    "Statistics: Organisation of Data",
+    "Statistics: Presentation of Data",
+    "Statistics: Measures of Central Tendency",
+    "Statistics: Measures of Dispersion",
+    "Statistics: Correlation",
+    "Statistics: Index Numbers",
+    "Statistics: Use of Statistical Tools",
+    "IED: Indian Economy on the Eve of Independence",
+    "IED: Indian Economy 1950-1990",
+    "IED: Liberalisation, Privatisation and Globalisation",
+    "IED: Poverty",
+    "IED: Human Capital Formation in India",
+    "IED: Rural Development",
+    "IED: Employment: Growth, Informalisation and Other Issues",
+    "IED: Infrastructure",
+    "IED: Environment and Sustainable Development",
+]
+
+_ACC_11 = [
+    "Introduction to Accounting",
+    "Theory Base of Accounting",
+    "Recording of Transactions I",
+    "Recording of Transactions II",
+    "Bank Reconciliation Statement",
+    "Trial Balance and Rectification of Errors",
+    "Depreciation, Provisions and Reserves",
+    "Bill of Exchange",
+    "Financial Statements I",
+    "Financial Statements II",
+    "Accounts from Incomplete Records",
+    "Applications of Computers in Accounting",
+    "Computerised Accounting System",
+]
+
+_CHAPTERS_11 = {
+    "Bio-Maths": {
+        "Physics":     _PHY_11,
+        "Chemistry":   _CHEM_11,
+        "Biology":     _BIO_11,
+        "Mathematics": _MATH_11,
+        "English":     _ENG_11,
+        "Hindi":       _HINDI_11,
+        "Tamil":       _TAMIL_11,
+    },
+    "Computer Science": {
+        "Physics":          _PHY_11,
+        "Chemistry":        _CHEM_11,
+        "Mathematics":      _MATH_11,
+        "Computer Science": _CS_11,
+        "English":          _ENG_11,
+        "Hindi":            _HINDI_11,
+        "Tamil":            _TAMIL_11,
+    },
+    "Commerce": {
+        "Business Studies": _BS_11,
+        "Economics":        _ECO_11,
+        "Accountancy":      _ACC_11,
+        "Mathematics":      _MATH_11,
+        "English":          _ENG_11,
+        "Hindi":            _HINDI_11,
+        "Tamil":            _TAMIL_11,
+    },
+}
+
+# ── Class 12 chapters ────────────────────────────────────────────────────────
+
+_PHY_12 = [
+    "Electric Charges and Fields",
+    "Electrostatic Potential and Capacitance",
+    "Current Electricity",
+    "Moving Charges and Magnetism",
+    "Magnetism and Matter",
+    "Electromagnetic Induction",
+    "Alternating Current",
+    "Electromagnetic Waves",
+    "Ray Optics and Optical Instruments",
+    "Wave Optics",
+    "Dual Nature of Radiation and Matter",
+    "Atoms",
+    "Nuclei",
+    "Semiconductor Electronics",
+]
+
+_CHEM_12 = [
+    "The Solid State",
+    "Solutions",
+    "Electrochemistry",
+    "Chemical Kinetics",
+    "Surface Chemistry",
+    "General Principles and Processes of Isolation of Elements",
+    "The p-Block Elements",
+    "The d- and f-Block Elements",
+    "Coordination Compounds",
+    "Haloalkanes and Haloarenes",
+    "Alcohols, Phenols and Ethers",
+    "Aldehydes, Ketones and Carboxylic Acids",
+    "Amines",
+    "Biomolecules",
+    "Polymers",
+    "Chemistry in Everyday Life",
+]
+
+_BIO_12 = [
+    "Reproduction in Organisms",
+    "Sexual Reproduction in Flowering Plants",
+    "Human Reproduction",
+    "Reproductive Health",
+    "Principles of Inheritance and Variation",
+    "Molecular Basis of Inheritance",
+    "Evolution",
+    "Human Health and Disease",
+    "Strategies for Enhancement in Food Production",
+    "Microbes in Human Welfare",
+    "Biotechnology: Principles and Processes",
+    "Biotechnology and its Applications",
+    "Organisms and Populations",
+    "Ecosystem",
+    "Biodiversity and Conservation",
+    "Environmental Issues",
+]
+
+_MATH_12 = [
+    "Relations and Functions",
+    "Inverse Trigonometric Functions",
+    "Matrices",
+    "Determinants",
+    "Continuity and Differentiability",
+    "Application of Derivatives",
+    "Integrals",
+    "Application of Integrals",
+    "Differential Equations",
+    "Vector Algebra",
+    "Three Dimensional Geometry",
+    "Linear Programming",
+    "Probability",
+]
+
+_CS_12 = [
+    "Python Revision Tour",
+    "Exception Handling",
+    "File Handling",
+    "Recursion",
+    "Searching",
+    "Sorting",
+    "Database Concepts and SQL",
+    "Networking and Communication Technology",
+    "Cybersecurity",
+]
+
+_ENG_12 = [
+    "Flamingo: The Last Lesson",
+    "Flamingo: Lost Spring",
+    "Flamingo: Deep Water",
+    "Flamingo: The Rattrap",
+    "Flamingo: Indigo",
+    "Flamingo: Poets and Pancakes",
+    "Flamingo: The Interview",
+    "Flamingo: Going Places",
+    "Vistas: The Third Level",
+    "Vistas: The Tiger King",
+    "Vistas: Journey to the End of the Earth",
+    "Vistas: The Enemy",
+    "Vistas: Should Wizard Hit Mommy",
+    "Vistas: On the Face of It",
+    "Vistas: Evans Tries an O-level",
+    "Vistas: Memories of Childhood",
+]
+
+_HINDI_12 = [
+    "Aroh: Harivanshrai Bachchan - Madhushala",
+    "Aroh: Algy Vajpayee - Kavitayen",
+    "Aroh: Kunwar Narayan - Kavitayen",
+    "Aroh: Raghuvir Sahay - Kavitayen",
+    "Aroh: Sham Narayan Pandey - Hamid Khan",
+    "Aroh: Umashankara Joshi - Kavitayen",
+    "Aroh: Phaniswarnath Renu - Paanch Parmeshwar",
+    "Aroh: Harishankar Parsai - Apna Apna Bhagya",
+    "Aroh: Mannu Bhandari - Tin Jawab",
+    "Aroh: Rambriksh Benipuri - Asthi Ksheera",
+    "Aroh: Hari Shankar Parsai - Bichhaa",
+    "Vitan: Surdas ki Jhopadi",
+    "Vitan: Pahelvan ki Dholak",
+    "Vitan: Shrinkhala ki Kadiyan",
+]
+
+_TAMIL_12 = [
+    "Iyal 1: Mudhal Padalam",
+    "Iyal 2: Irandaam Padalam",
+    "Iyal 3: Moondram Padalam",
+    "Iyal 4: Nankam Padalam",
+    "Iyal 5: Aindham Padalam",
+    "Iyal 6: Aaram Padalam",
+    "Tamil Grammar: Ezhuttu Ilakkanam",
+    "Tamil Grammar: Sol Ilakkanam",
+    "Tamil Grammar: Porul Ilakkanam",
+    "Tamil Literature: Sangam Ilakkiyam",
+    "Tamil Literature: Bhakthi Ilakkiyam",
+]
+
+_BS_12 = [
+    "Nature and Significance of Management",
+    "Principles of Management",
+    "Business Environment",
+    "Planning",
+    "Organising",
+    "Staffing",
+    "Directing",
+    "Controlling",
+    "Financial Management",
+    "Financial Markets",
+    "Marketing Management",
+    "Consumer Protection",
+]
+
+_ECO_12_MACRO = [
+    "Macro: Introduction to Macroeconomics",
+    "Macro: National Income Accounting",
+    "Macro: Money and Banking",
+    "Macro: Income Determination",
+    "Macro: Government Budget and the Economy",
+    "Macro: Open Economy Macroeconomics",
+]
+
+_ECO_12_MICRO = [
+    "Micro: Introduction to Microeconomics",
+    "Micro: Theory of Consumer Behaviour",
+    "Micro: Production and Costs",
+    "Micro: The Theory of the Firm under Perfect Competition",
+    "Micro: Market Equilibrium",
+    "Micro: Non-Competitive Markets",
+]
+
+_ECO_12 = _ECO_12_MICRO + _ECO_12_MACRO
+
+_ACC_12 = [
+    "Accounting for Not-for-Profit Organisation",
+    "Accounting for Partnership: Basic Concepts",
+    "Reconstitution of a Partnership Firm — Admission of a Partner",
+    "Reconstitution of a Partnership Firm — Retirement/Death of a Partner",
+    "Dissolution of Partnership Firm",
+    "Accounting for Share Capital",
+    "Issue and Redemption of Debentures",
+    "Financial Statements of a Company",
+    "Analysis of Financial Statements",
+    "Accounting Ratios",
+    "Cash Flow Statement",
+]
+
+_CHAPTERS_12 = {
+    "Bio-Maths": {
+        "Physics":     _PHY_12,
+        "Chemistry":   _CHEM_12,
+        "Biology":     _BIO_12,
+        "Mathematics": _MATH_12,
+        "English":     _ENG_12,
+        "Hindi":       _HINDI_12,
+        "Tamil":       _TAMIL_12,
+    },
+    "Computer Science": {
+        "Physics":          _PHY_12,
+        "Chemistry":        _CHEM_12,
+        "Mathematics":      _MATH_12,
+        "Computer Science": _CS_12,
+        "English":          _ENG_12,
+        "Hindi":            _HINDI_12,
+        "Tamil":            _TAMIL_12,
+    },
+    "Commerce": {
+        "Business Studies": _BS_12,
+        "Economics":        _ECO_12,
+        "Accountancy":      _ACC_12,
+        "Mathematics":      _MATH_12,
+        "English":          _ENG_12,
+        "Hindi":            _HINDI_12,
+        "Tamil":            _TAMIL_12,
+    },
+}
+
+# Master lookup
+_ALL_CHAPTERS = {
+    "Class 8":  _CHAPTERS_8,
+    "Class 9":  _CHAPTERS_9,
+    "Class 10": _CHAPTERS_10,
+    "Class 11": _CHAPTERS_11,
+    "Class 12": _CHAPTERS_12,
+}
+
+# ── Public helper functions ──────────────────────────────────────────────────
+
+def get_subjects(class_name: str, group: str = None) -> list:
+    if class_name in ("Class 11", "Class 12"):
+        return SUBJECTS_11_12.get(group, list(SUBJECTS_11_12["Bio-Maths"]))
+    return SUBJECTS_8_10
+
+
+def get_chapters(class_name: str, subject: str, group: str = None) -> list:
+    data = _ALL_CHAPTERS.get(class_name, {})
+    if class_name in ("Class 11", "Class 12"):
+        chapters = data.get(group, {}).get(subject, [])
+    else:
+        chapters = data.get(subject, [])
+    return chapters or ["General Topics"]
+
+
+# ── Starter questions ────────────────────────────────────────────────────────
+# Chapter-specific ones only for Class 10 (existing); all others use fallback
+
 STARTER_QUESTIONS_HINGLISH = {
-    # ── Science ──
+    # Class 10 Science
     "Chemical Reactions and Equations": [
         "Bhai chemical reaction aur physical change mein kya difference hai?",
         "Oxidation aur reduction samjhao with example",
         "Balancing equations kaise karte hai?",
     ],
     "Acids, Bases and Salts": [
-        "Acid aur base mein kya farak hota hai bhai?",
-        "pH scale kya hoti hai? Simple mein samjhao",
-        "Neutralization reaction kya hai?",
+        "pH scale kya hota hai?",
+        "Strong acid aur weak acid mein difference kya hai?",
+        "Neutralisation reaction explain karo",
     ],
     "Metals and Non-metals": [
-        "Metals aur non-metals mein kya difference hai?",
-        "Corrosion kya hota hai? Rust kyun lagta hai?",
-        "Reactivity series kya hai bhai?",
+        "Metals aur non-metals ki properties kya hain?",
+        "Ionic bond kaise banta hai?",
+        "Corrosion kya hota hai aur isse kaise rokein?",
     ],
     "Carbon and its Compounds": [
-        "Carbon ke itne saare compounds kyun hote hai?",
-        "Organic aur inorganic compounds mein kya farak hai?",
-        "Soap aur detergent kaise kaam karte hai?",
+        "Carbon ke allotropes kya hain?",
+        "Organic compounds ke functional groups samjhao",
+        "Soap kaise kaam karta hai?",
     ],
     "Life Processes": [
-        "Photosynthesis kya hota hai bhai?",
-        "Digestion ka pura process samjhao",
-        "Respiration aur breathing mein kya difference hai?",
+        "Photosynthesis aur respiration mein kya difference hai?",
+        "Human digestive system explain karo",
+        "Excretion kya hota hai?",
     ],
     "Control and Coordination": [
         "Nervous system kaise kaam karta hai?",
-        "Hormones kya hote hai? Examples do",
-        "Reflex action kya hota hai? Example se samjhao",
+        "Hormones kya hote hain?",
+        "Reflex action kya hota hai?",
     ],
     "How do Organisms Reproduce": [
         "Asexual aur sexual reproduction mein kya farak hai?",
-        "Binary fission kya hoti hai?",
-        "Human reproduction system samjhao simply",
+        "Binary fission kya hota hai?",
+        "Flowers mein reproduction kaise hota hai?",
     ],
     "Heredity": [
-        "Heredity matlab kya hota hai bhai?",
-        "Mendel ke experiments kya the?",
-        "Dominant aur recessive traits kya hai?",
+        "Mendel ke laws kya hain?",
+        "Dominant aur recessive traits explain karo",
+        "DNA kya hota hai?",
     ],
     "Light - Reflection and Refraction": [
-        "Reflection aur refraction mein kya difference hai?",
-        "Concave aur convex mirror mein farak kya hai?",
-        "Snell's law kya hai? Simple mein batao",
+        "Reflection ke laws kya hain?",
+        "Concave aur convex mirror mein kya difference hai?",
+        "Refraction kya hota hai?",
     ],
     "The Human Eye and the Colourful World": [
-        "Aankh mein image kaise banti hai?",
-        "Myopia aur hypermetropia kya hai?",
-        "Rainbow kaise banta hai bhai?",
+        "Human eye kaise kaam karta hai?",
+        "Myopia aur hypermetropia kya hain?",
+        "Rainbow kaise banta hai?",
     ],
     "Electricity": [
-        "Ohm's law kya hai? Simple mein samjhao",
-        "Series aur parallel circuit mein kya farak hai?",
-        "Resistance kya hota hai bhai?",
+        "Ohm's Law kya hai?",
+        "Series aur parallel circuits mein kya difference hai?",
+        "Electric power kya hota hai?",
     ],
     "Magnetic Effects of Electric Current": [
-        "Electromagnet kaise banta hai?",
-        "Fleming's left hand rule kya hai?",
-        "Electric motor kaise kaam karta hai?",
+        "Electromagnet kaise kaam karta hai?",
+        "Electric motor ka principle kya hai?",
+        "Faraday's law kya hai?",
     ],
     "Our Environment": [
-        "Ecosystem kya hota hai bhai?",
-        "Food chain aur food web mein kya farak hai?",
-        "Ozone layer kya hai aur kyun important hai?",
+        "Food chain aur food web kya hote hain?",
+        "Biodegradable aur non-biodegradable waste mein fark?",
+        "Ozone layer kya hoti hai?",
     ],
     "Sustainable Management of Natural Resources": [
-        "3 R's kya hai - Reduce, Reuse, Recycle?",
-        "Water harvesting kya hota hai?",
-        "Natural resources ko kaise conserve karein?",
+        "Natural resources kya hain?",
+        "3 R's (Reduce, Reuse, Recycle) explain karo",
+        "Forest conservation kyu zaroori hai?",
     ],
-
-    # ── Social Science — History ──
-    "History: The Rise of Nationalism in Europe": [
-        "Nationalism kya hota hai bhai? Easy mein samjhao",
-        "French Revolution ka nationalism se kya connection hai?",
-        "Frederic Sorrieu ki painting mein kya dikhaya gaya tha?",
-    ],
-    "History: Nationalism in India": [
-        "Non-Cooperation Movement kyun shuru hua?",
-        "Gandhi ji ka Civil Disobedience Movement kya tha?",
-        "Jallianwala Bagh massacre kya tha?",
-    ],
-    "History: The Making of a Global World": [
-        "Globalisation pehle kaise hoti thi? History batao",
-        "Silk Route kya tha bhai?",
-        "Great Depression kya tha aur kab hua?",
-    ],
-    "History: The Age of Industrialisation": [
-        "Industrial Revolution pehle England mein kyun hua?",
-        "Proto-industrialisation kya hoti hai?",
-        "India mein industrialisation ki history kya hai?",
-    ],
-    "History: Print Culture and the Modern World": [
-        "Printing press ka invention kaise hua?",
-        "Print culture ne nationalism ko kaise affect kiya?",
-        "India mein printing kab aayi?",
-    ],
-
-    # ── Social Science — Geography ──
-    "Geography: Resources and Development": [
-        "Resources kya hote hai? Types batao",
-        "Sustainable development kya hota hai?",
-        "Resource planning kya hai aur kyun zaroori hai?",
-    ],
-    "Geography: Forest and Wildlife Resources": [
-        "Van aur wildlife kyun important hain?",
-        "Deforestation ke kya consequences hain?",
-        "India mein wildlife conservation kaise hoti hai?",
-    ],
-    "Geography: Water Resources": [
-        "India mein water scarcity ka problem kya hai?",
-        "Multipurpose river projects ke fayde aur nuksan kya hain?",
-        "Rainwater harvesting kya hoti hai?",
-    ],
-    "Geography: Agriculture": [
-        "India mein farming ke types kya hain?",
-        "Green Revolution kya tha?",
-        "Kharif aur Rabi crops mein kya farak hai?",
-    ],
-    "Geography: Minerals and Energy Resources": [
-        "Minerals kahan se milte hain India mein?",
-        "Conventional aur non-conventional energy mein kya farak hai?",
-        "Solar energy kyun important hai?",
-    ],
-    "Geography: Manufacturing Industries": [
-        "Industries ka economy mein kya role hai?",
-        "Agro-based industries kya hoti hain?",
-        "Industrial pollution kaise reduce karein?",
-    ],
-    "Geography: Lifelines of National Economy": [
-        "Transport aur communication desh ke liye kyun zaroori hain?",
-        "Roadways aur railways mein kya difference hai?",
-        "India ke major ports kaun se hain?",
-    ],
-
-    # ── Social Science — Civics ──
-    "Civics: Power Sharing": [
-        "Power sharing kya hoti hai aur kyun zaroori hai?",
-        "Belgium aur Sri Lanka ka example kyun use karte hain?",
-        "Horizontal aur vertical power sharing mein kya farak hai?",
-    ],
-    "Civics: Federalism": [
-        "Federalism kya hota hai bhai?",
-        "India mein federalism kaise kaam karta hai?",
-        "Decentralisation kya hai?",
-    ],
-    "Civics: Gender, Religion and Caste": [
-        "Gender inequality kya hoti hai?",
-        "Communalism kya hota hai?",
-        "Caste aur politics ka kya connection hai?",
-    ],
-    "Civics: Political Parties": [
-        "Political parties kyun zaroori hain democracy mein?",
-        "India ki major political parties kaun si hain?",
-        "Political parties ke functions kya hote hain?",
-    ],
-    "Civics: Outcomes of Democracy": [
-        "Democracy ke kya fayde hain?",
-        "Democracy ki limitations kya hain?",
-        "Democracy aur economic growth ka kya connection hai?",
-    ],
-
-    # ── Social Science — Economics ──
-    "Economics: Development": [
-        "Development kya hota hai? Sirf income se kya nahi hota?",
-        "Human Development Index kya hai?",
-        "Per capita income kya hoti hai?",
-    ],
-    "Economics: Sectors of the Indian Economy": [
-        "Primary, secondary aur tertiary sector mein kya farak hai?",
-        "Organised aur unorganised sector kya hote hain?",
-        "India mein service sector itna bada kyun hai?",
-    ],
-    "Economics: Money and Credit": [
-        "Barter system se money system kaise aaya?",
-        "Bank se loan lene ka process kya hai?",
-        "Formal aur informal credit mein kya farak hai?",
-    ],
-    "Economics: Globalisation and the Indian Economy": [
-        "Globalisation kya hoti hai?",
-        "MNCs kya hote hain? India pe kya impact hai?",
-        "WTO kya hai?",
-    ],
-    "Economics: Consumer Rights": [
-        "Consumer rights kya hote hain?",
-        "COPRA kya hai?",
-        "Consumer forum mein complaint kaise karein?",
-    ],
-
-    # ── Mathematics ──
+    # Class 10 Maths
     "Real Numbers": [
-        "Rational aur irrational numbers mein kya farak hai?",
         "Euclid's division lemma kya hai?",
-        "HCF aur LCM kaise nikaalte hain?",
+        "Rational aur irrational numbers mein kya fark hai?",
+        "HCF aur LCM kaise nikalte hain?",
     ],
     "Polynomials": [
-        "Polynomial kya hoti hai? Types batao",
-        "Zeroes of a polynomial kya hote hain?",
-        "Relationship between zeroes and coefficients kya hai?",
+        "Polynomial ke zeroes kaise nikalte hain?",
+        "Division algorithm for polynomials explain karo",
+        "Quadratic polynomial ka graph kaisa hota hai?",
     ],
     "Pair of Linear Equations in Two Variables": [
-        "Linear equations solve karne ke methods kya hain?",
-        "Substitution method se equations kaise solve karein?",
-        "Graphically linear equations kaise solve karein?",
+        "Substitution method se equations kaise solve karte hain?",
+        "Graphically equations solve karne ka tarika samjhao",
+        "Consistent aur inconsistent equations kya hoti hain?",
     ],
     "Quadratic Equations": [
-        "Quadratic equation kya hoti hai?",
-        "Discriminant kya hota hai aur kya batata hai?",
-        "Quadratic formula se roots kaise nikaalein?",
+        "Quadratic formula kya hai?",
+        "Discriminant kya hota hai?",
+        "Factorisation se quadratic equations kaise solve karte hain?",
     ],
     "Arithmetic Progressions": [
-        "AP kya hoti hai? Simple mein batao",
-        "nth term of AP kaise nikaalte hain?",
-        "Sum of n terms of AP formula samjhao",
+        "AP ki general term kya hoti hai?",
+        "Sum of n terms formula samjhao",
+        "AP mein common difference kaise nikaalte hain?",
     ],
     "Triangles": [
-        "Similar triangles kya hote hain?",
+        "Similar triangles ki properties kya hain?",
+        "Basic Proportionality Theorem kya hai?",
         "Pythagoras theorem prove karo",
-        "AA, SAS, SSS similarity criteria kya hain?",
     ],
     "Coordinate Geometry": [
-        "Distance formula kya hai aur kaise use karein?",
-        "Section formula kya hota hai?",
-        "Area of triangle with coordinates kaise nikaalein?",
+        "Distance formula kya hai?",
+        "Midpoint formula explain karo",
+        "Section formula kya hoti hai?",
     ],
     "Introduction to Trigonometry": [
-        "Sin, cos, tan kya hote hain? Simply samjhao",
-        "Trigonometric ratios kaise yaad karein?",
-        "Complementary angles ka trigonometry mein kya role hai?",
+        "sin, cos, tan kya hote hain?",
+        "Trigonometric identities yaad karne ka tarika kya hai?",
+        "Complementary angles ka relation kya hai?",
     ],
     "Some Applications of Trigonometry": [
         "Angle of elevation aur depression kya hote hain?",
-        "Height and distance problems kaise solve karein?",
+        "Height and distance problems kaise solve karte hain?",
         "Real life mein trigonometry kahan use hoti hai?",
     ],
     "Circles": [
-        "Tangent to a circle kya hoti hai?",
-        "Tangent perpendicular to radius kyun hoti hai?",
-        "Two tangents from external point ke properties kya hain?",
+        "Tangent aur chord mein kya difference hai?",
+        "Tangent lengths equal kyu hoti hain?",
+        "Cyclic quadrilateral ki property kya hai?",
     ],
     "Areas Related to Circles": [
-        "Area of sector kaise nikalte hain?",
-        "Arc length ka formula kya hai?",
-        "Area of segment kaise calculate karein?",
+        "Sector aur segment ka area kaise nikalte hain?",
+        "Arc length formula kya hai?",
+        "Semicircle ka area kaise nikalte hain?",
     ],
     "Surface Areas and Volumes": [
-        "Cylinder ka surface area aur volume kaise nikaalein?",
+        "Cylinder ka curved surface area kya hota hai?",
         "Cone aur sphere ka volume formula samjhao",
-        "Frustum kya hota hai?",
+        "Combination of solids ke problems kaise karte hain?",
     ],
     "Statistics": [
-        "Mean, median, mode mein kya difference hai?",
-        "Grouped data ka mean kaise nikaalein?",
-        "Cumulative frequency graph kya hota hai?",
+        "Mean, Median, Mode mein kya fark hai?",
+        "Cumulative frequency table kaise banate hain?",
+        "Ogive curve kya hoti hai?",
     ],
     "Probability": [
-        "Probability kya hoti hai? Daily life example do",
-        "Theoretical aur experimental probability mein kya farak hai?",
-        "Playing cards aur dice ke probability questions kaise solve karein?",
-    ],
-
-    # ── English ──
-    "FF: A Letter to God": [
-        "Lencho ka God pe itna strong belief kyun tha?",
-        "Post office workers ne kya kiya aur kyun?",
-        "Story ka main theme kya hai?",
-    ],
-    "FF: Nelson Mandela - Long Walk to Freedom": [
-        "Nelson Mandela ki life struggle kya thi?",
-        "Apartheid kya tha?",
-        "Freedom ke baare mein Mandela kya sochte the?",
-    ],
-    "FF: Two Stories about Flying": [
-        "Young seagull ne flying kyun avoid ki?",
-        "Black aero plane story mein mysterious kya tha?",
-        "Dono stories ka common theme kya hai?",
-    ],
-    "FF: From the Diary of Anne Frank": [
-        "Anne Frank ki diary kyun famous hai?",
-        "Anne ne Kitty ko best friend kyun choose kiya?",
-        "Story ka historical context kya hai?",
-    ],
-    "FF: The Hundred Dresses-I": [
-        "Wanda Petronski ko school mein kya problems face karni padti thi?",
-        "Maddie aur Peggy mein kya difference tha?",
-        "Hundred dresses ka story mein kya symbolism hai?",
-    ],
-    "FF: The Hundred Dresses-II": [
-        "Wanda ke drawing competition mein jeetneke baad kya hua?",
-        "Maddie ko kaisa feel hua? Usne kya decision liya?",
-        "Story mein bullying ke baare mein kya message hai?",
-    ],
-    "FF: Glimpses of India": [
-        "Coorg ke baare mein interesting facts kya hain?",
-        "Tea industry ka Coorg se kya connection hai?",
-        "Lokesh story mein kya describe kiya gaya?",
-    ],
-    "FF: Mijbil the Otter": [
-        "Maxwell ne otter ko kahan se liya?",
-        "Mijbil ki funny habits kya thi?",
-        "Otter ko ghar mein rakhna kaisa experience tha?",
-    ],
-    "FF: Madam Rides the Bus": [
-        "Valli ki bus ride ki planning kaise ki?",
-        "Valli ne journey mein kya dekha?",
-        "Story ka ending sad kyun tha?",
-    ],
-    "FF: The Sermon at Benares": [
-        "Kisa Gotami ki story kya hai?",
-        "Buddha ne mustard seeds kyun maange?",
-        "Death aur grief ke baare mein story ka message kya hai?",
-    ],
-    "FF: The Proposal": [
-        "Lomov kyun Natalya ke paas rishta leke aaya?",
-        "Chukmuhovsky Meadows ka jhagda kis baat pe tha?",
-        "Play mein comedy kaise create ki gayi hai?",
-    ],
-    "Footprints: A Triumph of Surgery": [
-        "Tricki ko kya problem thi?",
-        "Mr. Herriot ne Tricki ka kya treatment kiya?",
-        "Mrs. Pumphrey ki mistake kya thi?",
-    ],
-    "Footprints: The Thief's Story": [
-        "Hari Singh ne Anil ke saath stay kyun choose kiya?",
-        "Hari Singh ne paise steal kiye lekin return kyun kiye?",
-        "Story mein Anil ka character kaisa tha?",
-    ],
-    "Footprints: The Midnight Visitor": [
-        "Ausable ne Fowler ko kya impress kiya?",
-        "Balcony wali story ka twist kya tha?",
-        "Ausable ki clever thinking ka example do",
-    ],
-    "Footprints: A Question of Trust": [
-        "Horace Danby kon tha aur kya karta tha?",
-        "Lady in red ne Horace ke saath kya kiya?",
-        "Story ka ironic twist kya tha?",
-    ],
-    "Footprints: Footprints without Feet": [
-        "Griffin ne invisible hone ki power kaise achieve ki?",
-        "Griffin ne invisibility ka use kaise kiya?",
-        "Story mein science fiction ka element kya hai?",
-    ],
-    "Footprints: The Making of a Scientist": [
-        "Richard Ebright ka passion kya tha?",
-        "Ebright ne butterflies pe kya discovery ki?",
-        "Scientific curiosity ke baare mein story kya batati hai?",
-    ],
-    "Footprints: The Necklace": [
-        "Matilda ki problem kya thi?",
-        "Necklace kho jaane ke baad kya hua?",
-        "Story ka moral kya hai?",
-    ],
-    "Footprints: The Hack Driver": [
-        "Narrator Lutkins ko kyun dhundh raha tha?",
-        "Bill Magnuson actually kaun tha?",
-        "Story ka humorous ending kya tha?",
-    ],
-    "Footprints: Bholi": [
-        "Bholi ko neglected kyun feel hota tha?",
-        "Teacher ne Bholi ki life kaise change ki?",
-        "Story mein women empowerment ka message kya hai?",
-    ],
-    "Footprints: The Book That Saved the Earth": [
-        "Story future mein set hai — kya interesting hai?",
-        "Martians ne Earth attack kyun cancel kiya?",
-        "Humpty Dumpty ka story mein kya role tha?",
-    ],
-
-    # ── Hindi ──
-    "Kshitij: Surdas - Pad": [
-        "Surdas ke pad mein Krishna ki kaisi image hai?",
-        "Bhakti rasa ka is kavita mein kya role hai?",
-        "Surdas ki bhasha aur shaili kaisi hai?",
-    ],
-    "Kshitij: Tulsidas - Ram-Lakshman-Parashuram Samvad": [
-        "Parashuram ka gussa kyun tha?",
-        "Lakshman ne Parashuram ko kya jawab diya?",
-        "Ram ki shaant pratikriya ka kya mahatva hai?",
-    ],
-    "Kshitij: Dev - Savaiya aur Kavitt": [
-        "Dev ki kavita mein nature ka kya varnan hai?",
-        "Savaiya aur Kavitt mein kya antar hota hai?",
-        "Dev ki bhakti bhavna kaisi hai?",
-    ],
-    "Kshitij: Jay Shankar Prasad - Aatm Parichay": [
-        "Kavita mein kaviyon ne kya parichay diya apna?",
-        "Prem aur dard ka kavita mein kya sansleshan hai?",
-        "Prasad ji ki chhayavadi shaili kaisi hai?",
-    ],
-    "Kshitij: Suryakant Tripathi Nirala - Utsaah": [
-        "Utsaah kavita mein badal se kya prerna li gayi hai?",
-        "Nirala ki kranti bhaavna kavita mein kaise jhalakti hai?",
-        "Kavita ka mukhy sandesh kya hai?",
-    ],
-    "Kshitij: Nagarjun - Yeh Danturit Muskan": [
-        "Shishu ki muskan ka kavi pe kya prabhav pada?",
-        "Kavita mein kis prakar ki kalpana ki gayi hai?",
-        "Nagarjun ki lokbhaasha ka udaharan do",
-    ],
-    "Kshitij: Rituraj - Kanyadan": [
-        "Maa ne beti ko vidai ke samay kya sikhaya?",
-        "Kavita mein stri-jeevan ki kaisi chinta hai?",
-        "Kavita ka bhaavarthh kya hai?",
-    ],
-    "Kshitij: Mangalesh Dabral - Sangatkar": [
-        "Sangatkar kaun hota hai? Uski bhumika kya hai?",
-        "Kavita mein kalpana aur vastavikata ka kya sansleshan hai?",
-        "Kavita ka pramukhh sandesh kya hai?",
-    ],
-    "Kshitij: Swayam Prakash - Netaji ka Chashma": [
-        "Halwai Capt. Chashma ke baare mein kahanee mein kya bataya gaya?",
-        "Desh bhakti ke baare mein kahanee kya sandesh deti hai?",
-        "Mukhy patra kaun hain aur unka charitra kaisa hai?",
-    ],
-    "Kshitij: Ramvriksh Benipuri - Balgobin Bhagat": [
-        "Balgobin Bhagat ki khasiyat kya thi?",
-        "Unka beta ke marne pe kya pratikriya thi?",
-        "Unke jeevan ka darshanik pahlu kya tha?",
-    ],
-    "Kshitij: Yadavendra Sharma - Lakhnavi Andaaz": [
-        "Train mein kaviyon ki mulaqaat kaisi rahi?",
-        "Nawabi andaaz ke baare mein kya vyangya hai?",
-        "Pathh ka mudda kya tha?",
-    ],
-    "Kshitij: Mannu Bhandari - Ek Kahani Yeh Bhi": [
-        "Lekhika ki rashtriya chetna kaise jagriit hui?",
-        "Pita ke charitra ka unke jeevan pe kya prabhav pada?",
-        "Naari swatantrata ke baare mein pathh kya kehta hai?",
-    ],
-    "Kshitij: Mahavir Prasad Dwivedi - Stri Shiksha": [
-        "Stri shiksha ke virodhi kaun the aur kya tark dete the?",
-        "Lekhak ne unka khandann kaise kiya?",
-        "Stri shiksha kyun zaroori hai?",
-    ],
-    "Kritika: Mata Ka Anchal": [
-        "Bacchpan ki yaadein kahanee mein kaisi hain?",
-        "Maa ka pyaar kahanee mein kaise dikhaya gaya hai?",
-        "Gramin jeevan ka chitran kaisa hai?",
-    ],
-    "Kritika: George Pancham Ki Naak": [
-        "George Pancham ki naak ki samasya kya thi?",
-        "Vyangya ki drishti se kahanee ka arth kya hai?",
-        "Rashtriya gaurav ke baare mein kahanee kya kehti hai?",
-    ],
-    "Kritika: Sana-Sana Haath Jodi": [
-        "Sikkim ki prakriti ka varnan kaisa tha?",
-        "Lekhika ne kin logon se mulaqat ki?",
-        "Yatra se kya seekhne ko mila?",
-    ],
-    "Kritika: Maine Dekha Ek Aandha Maidan": [
-        "Lekhak ne kya ajeeb anubhav kiya?",
-        "Pathh ka kendra-bindu kya hai?",
-        "Iss anubhav ka kya prabhav pada?",
-    ],
-
-    # ── Tamil ──
-    "Iyal 1: Karumai Niram": [
-        "Karumai Niram kavithai pathi sollu",
-        "Kavithaiyil enna vishayam pesapadukiarthu?",
-        "Kavignar yaar, avar kavithai shaili epdi irukku?",
-    ],
-    "Iyal 2: Inaindha Kai": [
-        "Inaindha Kai-la enna sandesh irukku?",
-        "Pathyathil yaara pathi pesapadukiarthu?",
-        "Unity pathi enna solkirathu?",
-    ],
-    "Iyal 3: Manidha Neyam": [
-        "Manidha Neyam pathyathil enna mukhiya vishayam?",
-        "Manitha araval pathi enna solkirathu?",
-        "Examples koodu explain pannu",
-    ],
-    "Iyal 4: Thamizhin Sirappu": [
-        "Tamil mozhi enna karana sirappu vaaikkirathu?",
-        "Thamizhin thoymaiyin varalaru enna?",
-        "Thamizh ilakkiyam pathi konjam sollu",
-    ],
-    "Iyal 5: Bharathiyar Kavithaigal": [
-        "Bharathiyar yaar? Avar kavithai pathi sollu",
-        "Desha bhakti Bharathiyar kavithailadum epdi varuthu?",
-        "Bharathiyar kavithaiyil pennin nilamai pathi enna solkirathu?",
-    ],
-    "Iyal 6: Thirukkural": [
-        "Thirukkural enna, yaaru ezhuthinar?",
-        "Arathupal, Porutpal, Inbathupal pathi sollu",
-        "Oru Kural-a example-a sollu, explain pannu",
-    ],
-    "Iyal 7: Sangam Ilakkiyam": [
-        "Sangam ilakkiyam enna, en important?",
-        "Akam aur Puram kavithai pathi sollu",
-        "Sangam kaala thamizhar vazhakai pathi enna theriyum?",
-    ],
-    "Iyal 8: Naadaka Ilakkiyam": [
-        "Naadakam - drama - ilakkiyathil enna vishesham?",
-        "Tamil naadakam varalaru konjam sollu",
-        "Pathyathil enna naadakam irukkiriarthu?",
-    ],
-    "Iyal 9: Adutha Kathai": [
-        "Kathai summary sollu",
-        "Mukhya pattirangal yaavar?",
-        "Kathai enna sandesh tharuthu?",
-    ],
-    "Tamil Grammar: Ezhuthu": [
-        "Tamil ezhuthu vaagai patti sollu",
-        "Uyir ezhuthu aur Mei ezhuthu-la enna farak?",
-        "Tamil alphabet structure epdi irukku?",
-    ],
-    "Tamil Grammar: Sol": [
-        "Sol vaagai patti sollu",
-        "Peyar sol, vinai sol patti sollu",
-        "Tamil grammar-la sol epdi work pannudhu?",
-    ],
-    "Tamil Grammar: Tholkappiyam": [
-        "Tholkappiyam enna? Yaaru ezhuthinar?",
-        "Tholkappiyam Tamil grammar-la enna role vaikkiriarthu?",
-        "Tholkappiyathil enna vishayangal pesukirathu?",
+        "Probability ki definition kya hai?",
+        "Complementary events kya hote hain?",
+        "Equally likely outcomes explain karo",
     ],
 }
 
-# ─────────────────────────────────────────────
-# STARTER QUESTIONS — TANGLISH
-# ─────────────────────────────────────────────
 STARTER_QUESTIONS_TANGLISH = {
-    # ── Science ──
+    # Class 10 Science
     "Chemical Reactions and Equations": [
-        "Anna chemical reaction vs physical change explain pannu",
-        "Oxidation and reduction-a example koodu sollu",
-        "Balancing equations epdi pannuvanga?",
+        "Chemical reaction-um physical change-um enna difference?",
+        "Oxidation aur reduction-a example-oda explain pannu",
+        "Equations balance pannuvadhu epdi?",
     ],
     "Acids, Bases and Salts": [
-        "Acid and base-la enna difference da?",
-        "pH scale-a simple-a explain pannu",
-        "Neutralization reaction enna?",
+        "pH scale enna solludhu?",
+        "Strong acid-um weak acid-um enna difference?",
+        "Neutralisation reaction explain pannu",
     ],
     "Metals and Non-metals": [
-        "Metals and non-metals-la enna difference?",
-        "Rust epdi varuthu? Corrosion explain pannu",
-        "Reactivity series enna anna?",
+        "Metals-um non-metals-um properties enna?",
+        "Ionic bond epdi form aagudhu?",
+        "Corrosion enna, epdi thadukkiradhu?",
     ],
     "Carbon and its Compounds": [
-        "Carbon compounds ipdi romba irukka karanam enna?",
-        "Organic and inorganic compounds-la enna difference?",
-        "Soap and detergent epdi work pannudhu?",
+        "Carbon allotropes enna?",
+        "Functional groups explain pannu",
+        "Soap epdi work pannudhu?",
     ],
     "Life Processes": [
-        "Photosynthesis-a simple-a sollu anna",
-        "Digestion process-a explain pannu",
-        "Respiration and breathing-la enna difference?",
+        "Photosynthesis-um respiration-um enna difference?",
+        "Human digestive system explain pannu",
+        "Excretion enna?",
     ],
     "Control and Coordination": [
         "Nervous system epdi work pannudhu?",
-        "Hormones enna? Examples sollu",
-        "Reflex action enna? Example koodu",
+        "Hormones enna?",
+        "Reflex action enna?",
     ],
     "How do Organisms Reproduce": [
-        "Asexual and sexual reproduction-la enna farak?",
-        "Binary fission enna?",
-        "Human reproduction-a simple-a explain pannu",
+        "Asexual-um sexual reproduction-um enna difference?",
+        "Binary fission explain pannu",
+        "Flowers-la reproduction epdi nadakkudhu?",
     ],
     "Heredity": [
-        "Heredity enna-nu sollu anna",
-        "Mendel experiments enna?",
-        "Dominant and recessive traits enna?",
+        "Mendel laws enna?",
+        "Dominant-um recessive traits-um explain pannu",
+        "DNA enna?",
     ],
     "Light - Reflection and Refraction": [
-        "Reflection and refraction-la enna difference?",
-        "Concave and convex mirror-la farak enna?",
-        "Snell's law-a simple-a sollu",
+        "Reflection laws enna?",
+        "Concave-um convex mirror-um enna difference?",
+        "Refraction enna?",
     ],
     "The Human Eye and the Colourful World": [
-        "Kaanla image epdi form aagudhu?",
-        "Myopia and hypermetropia enna?",
-        "Rainbow epdi varuthu anna?",
+        "Human eye epdi work pannudhu?",
+        "Myopia-um hypermetropia-um enna?",
+        "Rainbow epdi form aagudhu?",
     ],
     "Electricity": [
-        "Ohm's law-a simple-a explain pannu",
-        "Series and parallel circuit-la enna farak?",
-        "Resistance enna-nu sollu",
+        "Ohm's Law enna?",
+        "Series-um parallel circuits-um enna difference?",
+        "Electric power explain pannu",
     ],
     "Magnetic Effects of Electric Current": [
-        "Electromagnet epdi seivanga?",
-        "Fleming's left hand rule enna?",
-        "Electric motor epdi work pannudhu?",
+        "Electromagnet epdi work pannudhu?",
+        "Electric motor principle enna?",
+        "Faraday's law explain pannu",
     ],
     "Our Environment": [
-        "Ecosystem enna-nu sollu anna",
-        "Food chain and food web-la enna farak?",
-        "Ozone layer enna, yen important?",
+        "Food chain-um food web-um enna?",
+        "Biodegradable-um non-biodegradable-um enna difference?",
+        "Ozone layer enna?",
     ],
     "Sustainable Management of Natural Resources": [
-        "3 R's enna - Reduce, Reuse, Recycle?",
-        "Water harvesting enna?",
-        "Natural resources-a epdi conserve pannuvom?",
+        "Natural resources enna?",
+        "3 R's explain pannu",
+        "Forest conservation yen mukkiyam?",
     ],
-
-    # ── Social Science — History ──
-    "History: The Rise of Nationalism in Europe": [
-        "Nationalism enna-nu simple-a sollu anna",
-        "French Revolution-um nationalism-um epdi connect aaguthu?",
-        "Frederic Sorrieu painting-la enna kaatinaar?",
-    ],
-    "History: Nationalism in India": [
-        "Non-Cooperation Movement yen start aaguthu?",
-        "Gandhi Civil Disobedience Movement enna?",
-        "Jallianwala Bagh-la enna nadanthathu?",
-    ],
-    "History: The Making of a Global World": [
-        "Globalisation history-la epdi irundhuthu?",
-        "Silk Route enna anna?",
-        "Great Depression enna, eppo nadanthathu?",
-    ],
-    "History: The Age of Industrialisation": [
-        "Industrial Revolution England-la-ye yen mudhalla nadanthathu?",
-        "Proto-industrialisation enna?",
-        "India-la industrialisation history enna?",
-    ],
-    "History: Print Culture and the Modern World": [
-        "Printing press epdi invent aaguthu?",
-        "Print culture nationalism-a epdi affect pannuthu?",
-        "India-la printing eppo vandhathu?",
-    ],
-
-    # ── Social Science — Geography ──
-    "Geography: Resources and Development": [
-        "Resources enna? Types sollu",
-        "Sustainable development enna?",
-        "Resource planning yen important?",
-    ],
-    "Geography: Forest and Wildlife Resources": [
-        "Van and wildlife yen important?",
-        "Deforestation-oda consequences enna?",
-        "India-la wildlife conservation epdi nadukkirathu?",
-    ],
-    "Geography: Water Resources": [
-        "India-la water scarcity problem enna?",
-        "Multipurpose river projects-oda advantages and disadvantages enna?",
-        "Rainwater harvesting enna?",
-    ],
-    "Geography: Agriculture": [
-        "India-la farming types enna?",
-        "Green Revolution enna?",
-        "Kharif and Rabi crops-la farak enna?",
-    ],
-    "Geography: Minerals and Energy Resources": [
-        "India-la minerals enga kidaikum?",
-        "Conventional and non-conventional energy-la farak enna?",
-        "Solar energy yen important?",
-    ],
-    "Geography: Manufacturing Industries": [
-        "Industries economy-la enna role vaikkudhu?",
-        "Agro-based industries enna?",
-        "Industrial pollution epdi reduce pannuvom?",
-    ],
-    "Geography: Lifelines of National Economy": [
-        "Transport and communication yen important?",
-        "Roadways and railways-la enna difference?",
-        "India major ports edhellam?",
-    ],
-
-    # ── Social Science — Civics ──
-    "Civics: Power Sharing": [
-        "Power sharing enna, yen important?",
-        "Belgium and Sri Lanka example yen use pannuvanga?",
-        "Horizontal and vertical power sharing-la farak enna?",
-    ],
-    "Civics: Federalism": [
-        "Federalism enna-nu sollu anna",
-        "India-la federalism epdi work pannudhu?",
-        "Decentralisation enna?",
-    ],
-    "Civics: Gender, Religion and Caste": [
-        "Gender inequality enna?",
-        "Communalism enna?",
-        "Caste and politics epdi connect aaguthu?",
-    ],
-    "Civics: Political Parties": [
-        "Political parties democracy-la yen important?",
-        "India major political parties edhellam?",
-        "Political parties functions enna?",
-    ],
-    "Civics: Outcomes of Democracy": [
-        "Democracy-oda advantages enna?",
-        "Democracy-oda limitations enna?",
-        "Democracy and economic growth epdi connect aaguthu?",
-    ],
-
-    # ── Social Science — Economics ──
-    "Economics: Development": [
-        "Development enna? Sirf income mattum-a?",
-        "Human Development Index enna?",
-        "Per capita income enna?",
-    ],
-    "Economics: Sectors of the Indian Economy": [
-        "Primary, secondary, tertiary sector-la enna farak?",
-        "Organised and unorganised sector enna?",
-        "India-la service sector ipdi perusa yen?",
-    ],
-    "Economics: Money and Credit": [
-        "Barter system-la irundhu money system epdi vandhathu?",
-        "Bank-la loan edukkira process enna?",
-        "Formal and informal credit-la farak enna?",
-    ],
-    "Economics: Globalisation and the Indian Economy": [
-        "Globalisation enna?",
-        "MNCs enna? India-la enna impact?",
-        "WTO enna?",
-    ],
-    "Economics: Consumer Rights": [
-        "Consumer rights enna?",
-        "COPRA enna?",
-        "Consumer forum-la complaint epdi pannuvom?",
-    ],
-
-    # ── Mathematics ──
+    # Class 10 Maths
     "Real Numbers": [
-        "Rational and irrational numbers-la enna farak?",
         "Euclid's division lemma enna?",
-        "HCF and LCM epdi nikaaluvom?",
+        "Rational-um irrational numbers-um enna difference?",
+        "HCF-um LCM-um epdi kaankiradhu?",
     ],
     "Polynomials": [
-        "Polynomial enna? Types sollu",
-        "Zeroes of polynomial enna?",
-        "Zeroes and coefficients-la relationship enna?",
-    ],
-    "Pair of Linear Equations in Two Variables": [
-        "Linear equations solve panna methods enna?",
-        "Substitution method-la solve epdi pannuvom?",
-        "Graphically equations epdi solve pannuvom?",
+        "Polynomial zeroes epdi kaankiradhu?",
+        "Division algorithm explain pannu",
+        "Quadratic polynomial graph epdi irukkum?",
     ],
     "Quadratic Equations": [
-        "Quadratic equation enna?",
-        "Discriminant enna, enna solludhu?",
-        "Quadratic formula-la roots epdi nikaaluvom?",
+        "Quadratic formula enna?",
+        "Discriminant enna?",
+        "Factorisation-la solve pannuvadhu epdi?",
     ],
     "Arithmetic Progressions": [
-        "AP enna? Simple-a sollu",
-        "nth term of AP epdi nikaaluvom?",
+        "AP general term enna?",
         "Sum of n terms formula explain pannu",
+        "Common difference epdi kaankiradhu?",
     ],
     "Triangles": [
-        "Similar triangles enna?",
+        "Similar triangles properties enna?",
+        "Basic Proportionality Theorem enna?",
         "Pythagoras theorem prove pannu",
-        "AA, SAS, SSS similarity criteria enna?",
-    ],
-    "Coordinate Geometry": [
-        "Distance formula enna, epdi use pannuvom?",
-        "Section formula enna?",
-        "Coordinates-la triangle area epdi nikaaluvom?",
     ],
     "Introduction to Trigonometry": [
-        "Sin, cos, tan enna? Simple-a sollu",
-        "Trigonometric ratios epdi remember pannuvom?",
-        "Complementary angles trigonometry-la enna role?",
-    ],
-    "Some Applications of Trigonometry": [
-        "Angle of elevation and depression enna?",
-        "Height and distance problems epdi solve pannuvom?",
-        "Real life-la trigonometry enga use aagudhu?",
-    ],
-    "Circles": [
-        "Tangent to circle enna?",
-        "Tangent radius-ku perpendicular yen?",
-        "External point-la irundhu two tangents properties enna?",
-    ],
-    "Areas Related to Circles": [
-        "Sector area epdi nikaluvom?",
-        "Arc length formula enna?",
-        "Segment area epdi calculate pannuvom?",
-    ],
-    "Surface Areas and Volumes": [
-        "Cylinder surface area and volume epdi nikaaluvom?",
-        "Cone and sphere volume formula explain pannu",
-        "Frustum enna?",
+        "sin, cos, tan enna?",
+        "Trigonometric identities epdi remember pannuradhu?",
+        "Complementary angles relation enna?",
     ],
     "Statistics": [
-        "Mean, median, mode-la enna difference?",
-        "Grouped data mean epdi nikaaluvom?",
-        "Cumulative frequency graph enna?",
+        "Mean, Median, Mode enna difference?",
+        "Cumulative frequency table epdi podukiradhu?",
+        "Ogive curve enna?",
     ],
     "Probability": [
-        "Probability enna? Daily life example sollu",
-        "Theoretical and experimental probability-la farak enna?",
-        "Playing cards and dice probability questions epdi solve pannuvom?",
-    ],
-
-    # ── English ──
-    "FF: A Letter to God": [
-        "Lencho God-la ipdi strong belief yen vaichirundhan?",
-        "Post office workers enna pannanga, yen?",
-        "Story main theme enna?",
-    ],
-    "FF: Nelson Mandela - Long Walk to Freedom": [
-        "Nelson Mandela life struggle enna?",
-        "Apartheid enna?",
-        "Freedom pathi Mandela enna nenachaan?",
-    ],
-    "FF: Two Stories about Flying": [
-        "Young seagull flying yen avoid pannan?",
-        "Black aeroplane story-la mysterious enna?",
-        "Rendhu story-oda common theme enna?",
-    ],
-    "FF: From the Diary of Anne Frank": [
-        "Anne Frank diary yen famous?",
-        "Anne Kitty-ya best friend-a yen choose pannaanga?",
-        "Story historical context enna?",
-    ],
-    "FF: The Hundred Dresses-I": [
-        "Wanda Petronski school-la enna problems face pannaanga?",
-        "Maddie and Peggy-la enna difference?",
-        "Hundred dresses story-la enna symbolism?",
-    ],
-    "FF: The Hundred Dresses-II": [
-        "Wanda drawing competition-la jettukku appuram enna nadanthathu?",
-        "Maddie epdi feel pannaanga? Enna decision eduththaanga?",
-        "Bullying pathi story enna message tharuthu?",
-    ],
-    "FF: Glimpses of India": [
-        "Coorg pathi interesting facts enna?",
-        "Tea industry Coorg-oda connection enna?",
-        "Lokesh story-la enna describe pannaaru?",
-    ],
-    "FF: Mijbil the Otter": [
-        "Maxwell otter-a enga irundhu eduththaan?",
-        "Mijbil funny habits enna?",
-        "Otter-a veetla vaichukka epdi experience?",
-    ],
-    "FF: Madam Rides the Bus": [
-        "Valli bus ride epdi plan pannaanga?",
-        "Valli journey-la enna paathaanga?",
-        "Story ending yen sad-a irundhathu?",
-    ],
-    "FF: The Sermon at Benares": [
-        "Kisa Gotami story enna?",
-        "Buddha mustard seeds yen kettan?",
-        "Death and grief pathi story message enna?",
-    ],
-    "FF: The Proposal": [
-        "Lomov Natalya-kita yen vandhan?",
-        "Chukmuhovsky Meadows-la enna debate?",
-        "Play-la comedy epdi create pannaaru?",
-    ],
-    "Footprints: A Triumph of Surgery": [
-        "Tricki-ku enna problem irundhathu?",
-        "Mr. Herriot Tricki-ya epdi treat pannaaru?",
-        "Mrs. Pumphrey mistake enna?",
-    ],
-    "Footprints: The Thief's Story": [
-        "Hari Singh Anil-kita yen stay pannan?",
-        "Hari Singh paisa steal pannittu yen thirumba kuduththaan?",
-        "Story-la Anil character epdi irundhaan?",
-    ],
-    "Footprints: The Midnight Visitor": [
-        "Ausable Fowler-a epdi impress pannaaru?",
-        "Balcony story twist enna?",
-        "Ausable clever thinking example sollu",
-    ],
-    "Footprints: A Question of Trust": [
-        "Horace Danby yaar, enna pannan?",
-        "Red dress-la lady Horace-kita enna pannaanga?",
-        "Story ironic twist enna?",
-    ],
-    "Footprints: Footprints without Feet": [
-        "Griffin invisible power epdi achieve pannaaru?",
-        "Griffin invisibility-a epdi use pannaaru?",
-        "Story-la science fiction element enna?",
-    ],
-    "Footprints: The Making of a Scientist": [
-        "Richard Ebright passion enna?",
-        "Ebright butterflies-la enna discovery pannaaru?",
-        "Scientific curiosity pathi story enna solkiarthu?",
-    ],
-    "Footprints: The Necklace": [
-        "Matilda problem enna?",
-        "Necklace thavalittukku appuram enna nadanthathu?",
-        "Story moral enna?",
-    ],
-    "Footprints: The Hack Driver": [
-        "Narrator Lutkins-a yen thedi vandhan?",
-        "Bill Magnuson actually yaar?",
-        "Story humorous ending enna?",
-    ],
-    "Footprints: Bholi": [
-        "Bholi yen neglected-a feel pannaanga?",
-        "Teacher Bholi life epdi change pannaaru?",
-        "Story-la women empowerment message enna?",
-    ],
-    "Footprints: The Book That Saved the Earth": [
-        "Story future-la set — enna interesting?",
-        "Martians Earth attack yen cancel pannaanga?",
-        "Humpty Dumpty story-la enna role?",
-    ],
-
-    # ── Hindi ──
-    "Kshitij: Surdas - Pad": [
-        "Surdas pad-la Krishna pathi epdi sollaaru?",
-        "Bhakti rasa kavithaiyil epdi varuthu?",
-        "Surdas mozhi shaili epdi irukku?",
-    ],
-    "Kshitij: Tulsidas - Ram-Lakshman-Parashuram Samvad": [
-        "Parashuram yen kopapattaar?",
-        "Lakshman Parashuram-ku enna sollaaru?",
-        "Ram shaant response-oda maatchimai enna?",
-    ],
-    "Kshitij: Dev - Savaiya aur Kavitt": [
-        "Dev kavithaiyil nature pathi epdi sollaaru?",
-        "Savaiya and Kavitt-la enna difference?",
-        "Dev bhakti bhava epdi irukku?",
-    ],
-    "Kshitij: Jay Shankar Prasad - Aatm Parichay": [
-        "Kavithaiyil kaviyor enna parichay kudukkaaru?",
-        "Prem and dard kavithaiyil epdi mix aagudhu?",
-        "Prasad Chhayavadi style epdi irukku?",
-    ],
-    "Kshitij: Suryakant Tripathi Nirala - Utsaah": [
-        "Utsaah kavithaiyil badal-la irundhu enna prerna?",
-        "Nirala kranti feeling kavithaiyil epdi varuthu?",
-        "Kavithai main message enna?",
-    ],
-    "Kshitij: Nagarjun - Yeh Danturit Muskan": [
-        "Shishu muskan kavi-la epdi impact pannudhu?",
-        "Kavithaiyil enna karpanai irukku?",
-        "Nagarjun lokbhasha example sollu",
-    ],
-    "Kshitij: Rituraj - Kanyadan": [
-        "Maa beti-ku vidai-la enna sollaanga?",
-        "Kavithaiyil stri jeevan pathi epdi concern irukku?",
-        "Kavithai bhaavarthh enna?",
-    ],
-    "Kshitij: Mangalesh Dabral - Sangatkar": [
-        "Sangatkar yaar? Avar role enna?",
-        "Kavithaiyil kalpana and reality epdi mix aagudhu?",
-        "Kavithai main message enna?",
-    ],
-    "Kshitij: Swayam Prakash - Netaji ka Chashma": [
-        "Capt. Chashma pathi story-la enna sollaaru?",
-        "Desh bhakti pathi story enna message?",
-        "Main characters yaar, epdi irukkaanga?",
-    ],
-    "Kshitij: Ramvriksh Benipuri - Balgobin Bhagat": [
-        "Balgobin Bhagat-oda khasiyat enna?",
-        "Magan maranathukku appuram avar reaction enna?",
-        "Avar jeevanathil darshana element enna?",
-    ],
-    "Kshitij: Yadavendra Sharma - Lakhnavi Andaaz": [
-        "Train-la meeting epdi nadanthathu?",
-        "Nawabi style pathi enna vyangyam?",
-        "Pathyam mudda enna?",
-    ],
-    "Kshitij: Mannu Bhandari - Ek Kahani Yeh Bhi": [
-        "Lekhika rashtriya chetna epdi jagriit aaguthu?",
-        "Thanthai character avar jeevanathil enna impact?",
-        "Naari swatantrata pathi pathyam enna solkiarthu?",
-    ],
-    "Kshitij: Mahavir Prasad Dwivedi - Stri Shiksha": [
-        "Stri shiksha virodhi yaar, enna argument?",
-        "Lekhak epdi khandanam pannaaru?",
-        "Stri shiksha yen important?",
-    ],
-    "Kritika: Mata Ka Anchal": [
-        "Bacchpan memories kathaiyil epdi irukku?",
-        "Amma aasai kathaiyil epdi kaattu irukku?",
-        "Village life chitram epdi irukku?",
-    ],
-    "Kritika: George Pancham Ki Naak": [
-        "George Pancham naak samasya enna?",
-        "Vyangyam drishti-la kathai arth enna?",
-        "Rashtriya gaurav pathi kathai enna solkiarthu?",
-    ],
-    "Kritika: Sana-Sana Haath Jodi": [
-        "Sikkim nature pathi enna solluvanga?",
-        "Lekhika yaarai santhiththaanga?",
-        "Travel-la enna learn pannaanga?",
-    ],
-    "Kritika: Maine Dekha Ek Aandha Maidan": [
-        "Lekhak enna ajeeb experience pannaar?",
-        "Pathyam core vishayam enna?",
-        "Aa anubhavam enna impact?",
-    ],
-
-    # ── Tamil ──
-    "Iyal 1: Karumai Niram": [
-        "Karumai Niram kavithai pathi sollu",
-        "Kavithaiyil enna vishayam pesapadukiarthu?",
-        "Kavignar yaar, avar kavithai shaili epdi irukku?",
-    ],
-    "Iyal 2: Inaindha Kai": [
-        "Inaindha Kai-la enna sandesh irukku?",
-        "Pathyathil yaara pathi pesapadukiarthu?",
-        "Ottrumai pathi enna solkirathu?",
-    ],
-    "Iyal 3: Manidha Neyam": [
-        "Manidha Neyam-la mukhiya vishayam enna?",
-        "Manitha araval pathi enna solkirathu?",
-        "Examples koodu explain pannu",
-    ],
-    "Iyal 4: Thamizhin Sirappu": [
-        "Tamil mozhi yen sirappu vaaikkirathu?",
-        "Thamizhin thoymaiyin varalaru enna?",
-        "Thamizh ilakkiyam pathi sollu",
-    ],
-    "Iyal 5: Bharathiyar Kavithaigal": [
-        "Bharathiyar yaar? Avar kavithai pathi sollu",
-        "Desa bhakti Bharathiyar kavithaiyil epdi varuthu?",
-        "Bharathiyar kavithaiyil pennin nilamai enna?",
-    ],
-    "Iyal 6: Thirukkural": [
-        "Thirukkural enna, yaaru ezhuthinar?",
-        "Arathupal, Porutpal, Inbathupal pathi sollu",
-        "Oru Kural example-a sollu, explain pannu",
-    ],
-    "Iyal 7: Sangam Ilakkiyam": [
-        "Sangam ilakkiyam enna, yen important?",
-        "Akam and Puram kavithai pathi sollu",
-        "Sangam kaala thamizhar vazhakai pathi enna?",
-    ],
-    "Iyal 8: Naadaka Ilakkiyam": [
-        "Tamil drama ilakkiyathil enna vishesham?",
-        "Tamil naadakam varalaru sollu",
-        "Pathyathil enna naadakam?",
-    ],
-    "Iyal 9: Adutha Kathai": [
-        "Kathai summary sollu",
-        "Mukhya pattirangal yaavar?",
-        "Kathai enna sandesh tharuthu?",
-    ],
-    "Tamil Grammar: Ezhuthu": [
-        "Tamil ezhuthu vaagai patti sollu",
-        "Uyir ezhuthu and Mei ezhuthu-la enna farak?",
-        "Tamil alphabet structure epdi irukku?",
-    ],
-    "Tamil Grammar: Sol": [
-        "Sol vaagai patti sollu",
-        "Peyar sol, vinai sol patti sollu",
-        "Tamil grammar-la sol epdi work pannudhu?",
-    ],
-    "Tamil Grammar: Tholkappiyam": [
-        "Tholkappiyam enna? Yaaru ezhuthinar?",
-        "Tholkappiyam Tamil grammar-la enna role?",
-        "Tholkappiyathil enna vishayangal?",
+        "Probability definition enna?",
+        "Complementary events enna?",
+        "Equally likely outcomes explain pannu",
     ],
 }
 
+# Subject-level fallback starter questions (used for Class 8, 9, 11, 12)
+_FALLBACKS_HINGLISH = {
+    "Science":          ["Is chapter ka main concept samjhao", "Exam mein kya important hai?", "Ek real-life example do"],
+    "Physics":          ["Is chapter ka main concept kya hai?", "Formula explain karo", "Numericals kaise solve karte hain?"],
+    "Chemistry":        ["Is chapter ke key reactions samjhao", "Important definitions kya hain?", "Exam ke liye kya yaad rakhein?"],
+    "Biology":          ["Is topic ka diagram explain karo", "Important terms kya hain?", "Humans mein yeh kaise kaam karta hai?"],
+    "Mathematics":      ["Is chapter ka main formula kya hai?", "Ek example solve karke dikhao", "Common mistakes kya hoti hain?"],
+    "Social Science":   ["Is chapter ka main point kya hai?", "Important dates ya events kya hain?", "India se connection samjhao"],
+    "History":          ["Is event ki main wajah kya thi?", "Important dates yaad karne ka tarika?", "India pe kya asar hua?"],
+    "Geography":        ["Is chapter mein kya main concept hai?", "Map pe kahan hota hai yeh?", "India mein kahan relevant hai?"],
+    "Civics":           ["Is chapter ki main baat kya hai?", "Constitution mein kahan hai yeh?", "Real life mein kaise kaam karta hai?"],
+    "Economics":        ["Is chapter ka main idea kya hai?", "India ki economy se kaise joda?", "Important terms samjhao"],
+    "English":          ["Is chapter ki main theme kya hai?", "Important characters kaun hain?", "Exam ke liye kya important hai?"],
+    "Hindi":            ["Is kavita/gadya ka bhaav kya hai?", "Lekhak kya kehna chahte hain?", "Important lines yaad karne ka tarika?"],
+    "Tamil":            ["Idha pathi main concept enna?", "Important lines enna?", "Exam-la enna important?"],
+    "Computer Science": ["Is chapter ka main concept kya hai?", "Program example dikhao", "Common errors kya hoti hain?"],
+    "Business Studies": ["Is chapter ka main concept kya hai?", "Real company example do", "Exam ke liye kya important hai?"],
+    "Accountancy":      ["Journal entry kaise likhte hain?", "Important formulas kya hain?", "Common mistakes kya hoti hain?"],
+}
 
-def get_starter_questions(language: str, subject: str, chapter: str) -> list:
-    """Return 3 starter questions for the given language/subject/chapter."""
-    questions = STARTER_QUESTIONS_TANGLISH if language == "Tanglish" else STARTER_QUESTIONS_HINGLISH
-    fallback = (
-        ["Is chapter ke baare mein kuch bhi pooch!", "Koi bhi concept confusing lage toh bol!", "Yahan se start kar — basics pooch!"]
-        if language != "Tanglish"
-        else ["Idha pathi enna doubt-um kekko!", "Ethaavathu concept confuse-a irundha kelu!", "Basics-la irundhu start pannalam!"]
-    )
-    return questions.get(chapter, fallback)
+_FALLBACKS_TANGLISH = {
+    "Science":          ["Idha pathi main concept enna?", "Exam-la enna important?", "Oru real-life example kudu"],
+    "Physics":          ["Idha pathi main concept enna?", "Formula explain pannu", "Numericals epdi solve pannuradhu?"],
+    "Chemistry":        ["Key reactions explain pannu", "Important definitions enna?", "Exam-ku enna remember pannanum?"],
+    "Biology":          ["Diagram explain pannu", "Important terms enna?", "Humans-la idhu epdi work pannudhu?"],
+    "Mathematics":      ["Main formula enna?", "Oru example solve pannu", "Common mistakes enna?"],
+    "Social Science":   ["Main point enna?", "Important events enna?", "India-kku connection explain pannu"],
+    "History":          ["Idha nadandhadhu yen?", "Important dates epdi remember pannuradhu?", "India-la enna aana?"],
+    "Geography":        ["Main concept enna?", "Map-la enga irukkudhu?", "India-la enge relevant?"],
+    "Civics":           ["Main point enna?", "Constitution-la enga irukku?", "Real life-la epdi work pannudhu?"],
+    "Economics":        ["Main idea enna?", "India economy-la epdi jodikkiradhu?", "Important terms explain pannu"],
+    "English":          ["Main theme enna?", "Important characters yaar?", "Exam-ku enna important?"],
+    "Hindi":            ["Kavithai bhaav enna?", "Lekhak enna solla varen?", "Important lines epdi remember pannuradhu?"],
+    "Tamil":            ["Idha pathi main concept enna?", "Important lines enna?", "Exam-la enna important?"],
+    "Computer Science": ["Main concept enna?", "Program example kaattu", "Common errors enna?"],
+    "Business Studies": ["Main concept enna?", "Real company example kudu", "Exam-ku enna important?"],
+    "Accountancy":      ["Journal entry epdi ezhudhuradhu?", "Important formulas enna?", "Common mistakes enna?"],
+}
+
+_DEFAULT_FALLBACK_H = [
+    "Is chapter ke baare mein kuch bhi pooch!",
+    "Koi bhi concept clear karna ho toh bol!",
+    "Exam mein kya aata hai? Discuss karte hain!",
+]
+_DEFAULT_FALLBACK_T = [
+    "Idha pathi enna doubt-um kekko!",
+    "Yedhaavathu concept clear pannanum-na kelu!",
+    "Exam-la enna varudhu? Pesuvom!",
+]
 
 
-# Legacy compat
-STARTER_QUESTIONS = STARTER_QUESTIONS_HINGLISH
+def get_starter_questions(language: str, class_name: str, subject: str, chapter: str) -> list:
+    """Return 3 starter questions for the given context."""
+    if language == "Tanglish":
+        # Try chapter-specific (Class 10 only)
+        if class_name == "Class 10" and chapter in STARTER_QUESTIONS_TANGLISH:
+            return STARTER_QUESTIONS_TANGLISH[chapter]
+        return _FALLBACKS_TANGLISH.get(subject, _DEFAULT_FALLBACK_T)
+    else:
+        if class_name == "Class 10" and chapter in STARTER_QUESTIONS_HINGLISH:
+            return STARTER_QUESTIONS_HINGLISH[chapter]
+        return _FALLBACKS_HINGLISH.get(subject, _DEFAULT_FALLBACK_H)
+
+
+# ── Legacy aliases (keep app.py imports working during transition) ────────────
+SUBJECTS        = SUBJECTS_8_10
+SUBJECT_CHAPTERS = _CHAPTERS_10
