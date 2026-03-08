@@ -979,7 +979,7 @@ else:
     # Chat Input with file attachment
     accepted_types = ["png", "jpg", "jpeg", "pdf"] if PDF_SUPPORT else ["png", "jpg", "jpeg"]
     result = st.chat_input(
-        "Ask anything",
+        "Edha doubt kelu../Kuch doubt pooch...",
         accept_file=True,
         file_type=accepted_types,
     )
@@ -1056,20 +1056,20 @@ components.html("""
     btn.innerHTML = MIC_SVG;
     btn.title = 'Voice Input — click and speak';
     btn.style.cssText = [
-        'position:fixed',
-        'z-index:999999',
         'border:none',
         'background:#3d4450',
         'color:white',
         'cursor:pointer',
         'padding:0',
-        'display:none',
+        'display:flex',
         'align-items:center',
         'justify-content:center',
         'box-shadow:0 2px 8px rgba(0,0,0,0.4)',
         'transition:background 0.2s',
+        'margin-right:6px',
+        'flex-shrink:0'
     ].join(';');
-    pd.body.appendChild(btn);
+    // Removed direct body append
 
     // Inject CSS to make the send button match the mic button style
     if (!pd.getElementById('padhai-send-style')) {
@@ -1094,27 +1094,29 @@ components.html("""
         pd.head.appendChild(style);
     }
 
-    // Find the send button and snap the mic button right next to it, same size
-    function snapToSendBtn() {
+    // Insert mic button snugly as a sibling BEFORE the send button,
+    // leaning on native CSS layout to fix any movement delay (woggling)
+    var pdRAF = pw.requestAnimationFrame;
+    var attachLoop = setInterval(function() {
+        if (!window.parent) { clearInterval(attachLoop); return; }
         var sendBtn = pd.querySelector('[data-testid="stChatInputSubmitButton"]')
                    || pd.querySelector('[data-testid="stChatInput"] button');
-        if (!sendBtn) return;
-        var r = sendBtn.getBoundingClientRect();
-        // Match exact size of the send button
-        btn.style.width  = r.width  + 'px';
-        btn.style.height = r.height + 'px';
-        btn.style.lineHeight = r.height + 'px';
-        btn.style.borderRadius = pw.getComputedStyle(sendBtn).borderRadius;
-        // Place mic button directly to the LEFT of the send button, vertically centered
-        btn.style.top  = r.top + 'px';
-        btn.style.left = (r.left - r.width - 6) + 'px';
-        btn.style.display = 'flex';
-    }
+        
+        if (sendBtn && sendBtn.parentNode) {
+            if (sendBtn.previousSibling !== btn) {
+                var compStyle = pw.getComputedStyle(sendBtn);
+                btn.style.height = compStyle.height;
+                btn.style.width = compStyle.height; // Square by default, same size as send height
+                btn.style.borderRadius = compStyle.borderRadius;
+                sendBtn.parentNode.insertBefore(btn, sendBtn);
+            }
+        }
+    }, 250);
+    // Cleanup interval after long idle mapping
+    setTimeout(function() { clearInterval(attachLoop); }, 60000);
 
-    // Poll until the send button appears, then keep in sync
-    var snapInterval = setInterval(snapToSendBtn, 300);
-    // Stop polling after 30 s to avoid memory leak
-    setTimeout(function() { clearInterval(snapInterval); }, 30000);
+    // Stop existing loop from previous script execution and start new
+    if (pw.padhaiMicRAF) pw.cancelAnimationFrame(pw.padhaiMicRAF);
 
     // Speech recognition logic
     var rec = null;
