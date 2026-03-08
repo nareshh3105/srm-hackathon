@@ -206,10 +206,12 @@ User Input (text / voice / image / PDF)
 
 ---
 
-## Team
+## Team - AI Builders
 
-Built for **SRM Hackathon 2025**.
-
+- Naresh Kumar G S (II, EEE, SSN College Of Engineering)
+- Sujitha C B (II, CSE, SSN College Of Engineering)
+\
+Built for SRM Hackathon
 ---
 
 ## License
